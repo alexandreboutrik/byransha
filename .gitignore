@@ -80,6 +80,12 @@ deploy.exclude.lst
 !.idea/runConfigurations/
 !.idea/runConfigurations/Start_Backend.xml
 
+# Eclipse IDE
+.classpath
+.project
+.settings/
+.factorypath
+
 # Si tu génères un coverage local ou si tu utilises Jacoco
 coverage/
 .jacoco/
