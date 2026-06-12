@@ -25,9 +25,16 @@ public class HardwareKey {
 
 	// Fixed salt — bake into your application at build time
 	// Change this per-application to namespace your keys
+	// TODO: avoid hardcoding the salt.
 	private static final byte[] APP_SALT = { (byte) 0xA3, (byte) 0x7F, (byte) 0x2C, (byte) 0x88, (byte) 0x14,
 			(byte) 0xE6, (byte) 0x5B, (byte) 0x91, (byte) 0xD2, (byte) 0x4A, (byte) 0x09, (byte) 0xCC, (byte) 0x73,
 			(byte) 0x1E, (byte) 0xF0, (byte) 0x3D };
+
+	/*
+	 * FIX: Maybe consider changing how the fingerprint is done. As it is now,
+	 * an update can change it and the encrypion key would be permanently lost.
+	 * TODO: Consider using Java KeyStore (JKS).
+	 */
 
 	/**
 	 * Derives a stable AES-256 key from local hardware components. The same
@@ -111,6 +118,8 @@ public class HardwareKey {
 	}
 
 	// Motherboard/system serial number
+	// TODO: requires root. Maybe it would be better to change to
+	// /etc/machine-id instead ?
 	private static String getMotherboardSerial() {
 		try {
 			String os = System.getProperty("os.name").toLowerCase();
