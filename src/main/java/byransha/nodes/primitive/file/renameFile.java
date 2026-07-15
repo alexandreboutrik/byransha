@@ -1,9 +1,10 @@
-package byransha.nodes.primitive;
+package byransha.nodes.primitive.file;
 
 import java.io.File;
 
 import byransha.graph.ProcedureAction;
-import byransha.nodes.primitive.openFile.file;
+import byransha.nodes.primitive.StringNode;
+import byransha.nodes.primitive.file.openFile.file;
 
 public class renameFile extends ProcedureAction<FileNode> {
 	StringNode newName;
@@ -11,6 +12,7 @@ public class renameFile extends ProcedureAction<FileNode> {
 	public renameFile(FileNode inputNode) {
 		super(inputNode, file.class);
 		this.newName = new StringNode(this, inputNode.file.getName(), ".+");
+		hasButtonOnKishanView=true;
 	}
 
 	@Override

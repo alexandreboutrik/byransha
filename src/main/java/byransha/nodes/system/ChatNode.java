@@ -32,6 +32,7 @@ public class ChatNode extends BNode {
 
 	public void append(BNode n) {
 		Objects.requireNonNull(n, "cannot append null node to chat");
+
 		if (!nodes.elements.isEmpty() && n == nodes.elements.getLast()) // if same node
 			return;
 
@@ -47,6 +48,7 @@ public class ChatNode extends BNode {
 			} else {
 				System.out.println("parmeters: " + action.parameters());
 				nodes.elements.add(action);
+				action.chat = this;
 			}
 		} else {
 			nodes.elements.add(n);

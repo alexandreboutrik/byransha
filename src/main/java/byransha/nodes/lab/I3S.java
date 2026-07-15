@@ -3,7 +3,6 @@ package byransha.nodes.lab;
 import java.io.File;
 import java.io.IOException;
 
-import byransha.graph.BGraph;
 import byransha.graph.BNode;
 
 /*
@@ -17,16 +16,12 @@ public class I3S extends Lab {
 		super(g);
 		name.set("I3S");
 
-
-		
 		var lakeD = new File(g().byransha.homeDirectory, "data_lake");
-		var lake = new DataLake(g(), lakeD);
 
-		try {
-			lake.load(this);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		if (lakeD.exists()) {
+			var lake = new DataLake(g(), lakeD);
+		} else {
+			System.out.println("data lake not found at " + lakeD.getAbsolutePath());
 		}
-
 	}
 }

@@ -70,7 +70,6 @@ public class Sheet extends JPanel implements Scrollable {
 		currentLine.setBackground(bgColor);
 		add(currentLine);
 		return currentLine;
-
 	}
 
 	public void clear() {

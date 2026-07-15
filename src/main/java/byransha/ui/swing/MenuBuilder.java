@@ -36,7 +36,7 @@ public class MenuBuilder {
 			if (a.path == null) {
 				popup.add(makeItem(a, chat));
 			} else {
-				 List<Class<? extends Category>> aa = List.of(a.path);
+				List<Class<? extends Category>> aa = List.of(a.path);
 				var segments = new ArrayList<>(aa);
 				menu(popup, segments, menus).add(makeItem(a, chat));
 			}
@@ -54,7 +54,8 @@ public class MenuBuilder {
 		l.forEach(cc -> c.add(cc));
 	}
 
-	private static JMenu menu(JPopupMenu popup, ArrayList<Class<? extends Category>> segments, Map<String, JMenu> menus) {
+	private static JMenu menu(JPopupMenu popup, ArrayList<Class<? extends Category>> segments,
+			Map<String, JMenu> menus) {
 		final var path = segments.stream().map(s -> s.getSimpleName()).collect(Collectors.joining("/"));
 		var m = menus.get(path);
 
@@ -74,10 +75,7 @@ public class MenuBuilder {
 	private static JMenuItem makeItem(Action a, ChatNode chat) {
 		var i = new JMenuItem(a.whatItDoes());
 		i.setEnabled(a.applies());
-		i.addActionListener(e -> {
-			chat.append(a);
-		});
+		i.addActionListener(e -> chat.append(a));
 		return i;
 	}
-
 }

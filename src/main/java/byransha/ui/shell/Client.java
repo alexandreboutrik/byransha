@@ -15,10 +15,12 @@ import byransha.graph.BNode;
 import byransha.graph.list.action.FunctionAction;
 import byransha.nodes.system.ChatNode;
 import byransha.nodes.system.SystemNode;
+import byransha.ui.shell.Client.CommandAction;
 import byransha.util.ByUtils;
 
 public class Client extends SystemNode {
-	ChatNode currentChat;
+	public ChatNode currentChat;
+	public static ChatNode lastActiveChat;
 
 	@FunctionalInterface
 	interface CommandAction {
@@ -38,6 +40,7 @@ public class Client extends SystemNode {
 		var out = new PrintWriter(clientSocket.getOutputStream(), true);
 		var chatID = Long.valueOf(in.readLine());
 		currentChat = (ChatNode) g().indexes.byId.get(chatID);
+		lastActiveChat = currentChat;
 		initializeCommands(g());
 
 		new Thread(() -> {
@@ -102,7 +105,7 @@ public class Client extends SystemNode {
 		commands.put("newchat",
 				new Command("create new chat", (out, parms) -> out.println(new ChatNode(graph.currentUser()).id())));
 		commands.put("setcurrentchat", new Command("change chat", (out, parms) -> out
-				.println(currentChat = (ChatNode) graph.indexes.byId.getByText(parms.removeFirst()))));
+				.println(lastActiveChat = currentChat = (ChatNode) graph.indexes.byId.getByText(parms.removeFirst()))));
 		commands.put("deletechat",
 				new Command("delete node", (out, parms) -> graph.indexes.byId.getByText(parms.removeFirst()).delete()));
 	}

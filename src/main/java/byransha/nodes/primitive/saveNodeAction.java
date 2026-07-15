@@ -5,13 +5,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import byransha.graph.list.action.FunctionAction;
-import byransha.nodes.primitive.openFile.file;
+import byransha.nodes.primitive.file.FileNode;
+import byransha.nodes.primitive.file.openFile.file;
 
 public final class saveNodeAction extends FunctionAction<TextNode, FileNode> {
 	StringNode fileNameNode = new StringNode(this, "example.txt", ".+\\..+");
 
 	protected saveNodeAction(TextNode textNode) {
 		super(textNode, file.class);
+		hasButtonOnKishanView=true;
 	}
 
 	@Override

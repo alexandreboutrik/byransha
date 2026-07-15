@@ -23,7 +23,7 @@ public class Search extends FunctionAction<BNode, ListNode> {
 
 	@Override
 	public void impl() {
-		var list = new ListNode<>(null, "search result at depth " + depth, BNode.class);
+		var list = new ListNode<>(this, "search result at depth " + depth, BNode.class);
 		inputNode.bfs(depth.get(), n -> accept(n), (n, depth) -> list.elements.add(n));
 		result = list;
 	}

@@ -5,7 +5,7 @@ import java.nio.file.Files;
 
 import byransha.graph.Category;
 import byransha.graph.list.action.FunctionAction;
-import byransha.nodes.primitive.FileNode;
+import byransha.nodes.primitive.file.FileNode;
 
 public class Deploy extends FunctionAction<Website, FileNode> {
 	FileNode directory;

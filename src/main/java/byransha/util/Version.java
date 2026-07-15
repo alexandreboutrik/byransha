@@ -41,12 +41,9 @@ package byransha.util;
 import java.util.Arrays;
 
 public class Version implements Comparable<Version> {
-	private int[] numbers = new int[3];
+	private int[] numbers = new int[] {0, 0, 1};
 
 
-	public Version(String string) {
-		// TODO Auto-generated constructor stub
-	}
 
 	public void set(String s) {
 		String[] a = s.split("\\.");

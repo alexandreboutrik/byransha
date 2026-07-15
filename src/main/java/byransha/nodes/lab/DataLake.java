@@ -13,10 +13,11 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import byransha.graph.ActionMethod;
 import byransha.graph.BGraph;
 import byransha.graph.BNode;
 import byransha.graph.ShowInKishanView;
-import byransha.nodes.primitive.FileNode;
+import byransha.nodes.primitive.file.FileNode;
 import byransha.util.Cout;
 
 public class DataLake extends BNode {
@@ -90,6 +91,7 @@ public class DataLake extends BNode {
 		return "datalake at " + dir.file.getAbsolutePath();
 	}
 
+	@ActionMethod
 	public void load(Lab i3s) throws IOException {
 		if (dir == null)
 			throw new NullPointerException();

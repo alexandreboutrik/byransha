@@ -32,7 +32,6 @@ public class ChatSheet extends Sheet {
 		newLine();
 		newLine();
 
-		// TODO enable sheets in sheets
 		var is = this;// new ChatSheet(chat);
 
 		var path = n.path().elements;
@@ -55,98 +54,6 @@ public class ChatSheet extends Sheet {
 		is.newLine();
 		n.writeKishanView(is);
 
-		if (n instanceof Action action) {
-			is.newLine();
-			JTextField queryPromptField = null;
-
-			if (action instanceof QueryIA queryIA) {
-				queryPromptField = new JTextField(queryIA.prompt.get() == null ? "" : queryIA.prompt.get(), 28);
-				is.appendToCurrentLine(queryPromptField);
-
-				var jsonOnly = createResponseModeBubble("JSON only");
-				var Conversation = createResponseModeBubble("Conversation");
-
-				var group = new ButtonGroup();
-				group.add(jsonOnly);
-				group.add(Conversation);
-
-				if (queryIA.getResponseMode() == QueryIA.ResponseMode.CONVERSATION) {
-					Conversation.setSelected(true);
-
-				} else {
-					jsonOnly.setSelected(true);
-				}
-
-				jsonOnly.addActionListener(e -> queryIA.setResponseMode(QueryIA.ResponseMode.JSON_ONLY));
-				Conversation.addActionListener(e -> queryIA.setResponseMode(QueryIA.ResponseMode.CONVERSATION));
-
-				is.appendToCurrentLine(jsonOnly);
-				is.appendToCurrentLine(Conversation);
-			}
-
-			var b = new JButton("Ok");
-			final JTextField finalQueryPromptField = queryPromptField;
-			b.addActionListener(e -> {
-				if (action.isRunning()) {
-					return;
-				}
-
-				if (action instanceof QueryIA queryIAAction && finalQueryPromptField != null) {
-					queryIAAction.prompt.set(finalQueryPromptField.getText());
-				}
-
-				b.setEnabled(false);
-				b.setText("Running...");
-
-				TextNode liveResponseNode = null;
-				final StringBuilder liveResponseText = new StringBuilder();
-
-				if (action instanceof FunctionAction<?, ?>) {
-					liveResponseNode = new TextNode(chat.g(), "IA response", "");
-					chat.append(liveResponseNode);
-
-					final var targetNode = liveResponseNode;
-					action.outputConsumer = chunk -> {
-						if (chunk == null) {
-							return;
-						}
-
-						final String snapshot;
-						synchronized (liveResponseText) {
-							liveResponseText.append(String.valueOf(chunk));
-							snapshot = liveResponseText.toString();
-						}
-
-						SwingUtilities.invokeLater(() -> targetNode.set(snapshot));
-					};
-				}
-
-				action.chat = chat;
-				action.execAsync();
-
-				final TextNode finalLiveResponseNode = liveResponseNode;
-				new Thread(() -> {
-					action.waitForCompletion();
-
-					SwingUtilities.invokeLater(() -> {
-						try {
-							if (action instanceof FunctionAction<?, ?> fa && fa.result != null) {
-								if (finalLiveResponseNode != null && fa.result instanceof TextNode tn) {
-									finalLiveResponseNode.set(tn.get());
-								} else {
-									chat.append(fa.result);
-								}
-							}
-						} finally {
-							b.setText("Ok");
-							b.setEnabled(true);
-						}
-					});
-				}, action.technicalName() + "-ui-waiter").start();
-			});
-			is.appendToCurrentLine(b);
-		}
-
 		// appendToCurrentLine(is);
 		newLine();
 
@@ -161,15 +68,6 @@ public class ChatSheet extends Sheet {
 
 	public void appendToCurrentLine(String s) {
 		super.appendToCurrentLine(s, chat.g().translator);
-	}
-
-	private JToggleButton createResponseModeBubble(String text) {
-		var bubble = new JToggleButton(text);
-		bubble.setFocusPainted(false);
-		bubble.setMargin(new Insets(4, 10, 4, 10));
-		bubble.setBackground(new Color(0xF2, 0xF2, 0xF2));
-		bubble.setOpaque(true);
-		return bubble;
 	}
 
 }

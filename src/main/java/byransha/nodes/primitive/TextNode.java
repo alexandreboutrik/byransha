@@ -101,6 +101,5 @@ public class TextNode extends PrimitiveValueNode<String> {
 
 			pane.appendToCurrentLine(Utils.resizableScrollPane(p));
 		}
-
 	}
 }

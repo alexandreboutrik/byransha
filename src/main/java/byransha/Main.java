@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import byransha.ai.OllamaModel;
 import byransha.event.Event;
 import byransha.graph.BGraph;
 import byransha.graph.BNode;
@@ -21,8 +20,6 @@ public class Main {
 	static BGraph g;
 
 	public static void main(String[] args) throws Throwable {
-		OllamaModel.initialModel(null);
-
 //		System.out.println("IA".split("/").length);
 
 		// java.awt.Toolkit.getDefaultToolkit();

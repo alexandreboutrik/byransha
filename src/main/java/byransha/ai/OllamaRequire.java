@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import byransha.ai.OllamaRequire.OS;
+
 public class OllamaRequire {
 
     public enum OS {
@@ -13,7 +15,7 @@ public class OllamaRequire {
     private static OS currentOS = detectOS();
     private static Scanner scanner = new Scanner(System.in);
 
-    public static void checkRequirements() {
+    public static boolean checkRequirements() {
         System.out.println(" *** Checking requirements *** ");
         List<String> missing = new ArrayList<>();
         checkTool("ollama", "--version", "Ollama", missing);
@@ -46,8 +48,8 @@ public class OllamaRequire {
         System.out.println("***\n All requirements are met!\n");
         
         // On s'assure que le modèle est téléchargé ("pull" plutôt que "run" pour éviter que le chat bloque l'appli JVM)
-        downloadOllamaModel("yi-coder:1.5b");
         downloadOllamaModel("granite4:tiny-h");
+        return true;
     }
 
     private static void downloadOllamaModel(String modelName) {

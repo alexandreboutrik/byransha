@@ -67,6 +67,8 @@ byransha-classpath.lst
 main.java-classpath.lst
 deploy.exclude.lst
 
+\node_modules/
+
 ################################################################################
 # Autres fichiers potentiellement sensibles
 ################################################################################

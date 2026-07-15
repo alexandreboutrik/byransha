@@ -27,11 +27,13 @@ import java.util.stream.Collectors;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -48,10 +50,11 @@ import byransha.graph.action.search.SearchRegexp;
 import byransha.graph.action.search.SearchText;
 import byransha.graph.list.action.ListNode;
 import byransha.graph.relection.ClassNode;
-import byransha.nodes.primitive.FileNode;
+import byransha.network.Message;
 import byransha.nodes.primitive.LongNode;
 import byransha.nodes.primitive.StringNode;
 import byransha.nodes.primitive.ValuedNode;
+import byransha.nodes.primitive.file.FileNode;
 import byransha.nodes.system.ChatNode;
 import byransha.nodes.system.User;
 import byransha.ui.swing.ChatSheet;
@@ -70,6 +73,10 @@ import byransha.util.Stop;
 import byransha.util.TriConsumer;
 
 public abstract class BNode {
+	final public static JsonNodeFactory factory = new JsonNodeFactory(true);
+	final public static ObjectMapper objectMapper = new ObjectMapper();
+
+	
 	public final BNode parent;
 	public boolean readOnly;
 	protected boolean resilient = false;
@@ -92,6 +99,9 @@ public abstract class BNode {
 			// g().eventList.add(new NewNodeEvent<>(this));
 		}
 	}
+
+	protected void handle(Message msg) {
+	};
 
 	public String findRoleOf(BNode n) {
 		var foundRole = new String[1];
@@ -248,7 +258,7 @@ public abstract class BNode {
 			cachedActions = new ListNode<>(this, "actions for node " + this, Action.class);
 			createActions();
 
-			for (var m : getClass().getDeclaredMethods()) {
+			for (var m : getClass().getMethods()) {
 				if (m.isAnnotationPresent(ActionMethod.class)) {
 					cachedActions.elements.add(new MethodAction(this, m));
 				}
@@ -357,13 +367,7 @@ public abstract class BNode {
 		});
 	}
 
-	private BNode instantiateRenderingNodeFor(Object o) {
-		if (o instanceof File f) {
-			return new FileNode(this, f);
-		} else {
-			return new StringNode(this, o.toString(), "*");
-		}
-	}
+	
 
 	public void forEachOutInMethods(Class<? extends BNode> from, Class<? extends BNode> until,
 			BiConsumer<Method, BNode> consumer) {
@@ -384,7 +388,8 @@ public abstract class BNode {
 					if (graph != null && graph.errorLog != null) {
 						graph.errorLog.add(e);
 					} else {
-						System.err.println("Erreur pour la méthode " + m.getName() + " sur " + this.getClass().getName());
+						System.err
+								.println("Erreur pour la méthode " + m.getName() + " sur " + this.getClass().getName());
 						e.printStackTrace();
 					}
 				}
@@ -564,7 +569,6 @@ public abstract class BNode {
 		});
 	}
 
-	final public static JsonNodeFactory factory = new JsonNodeFactory(true);
 
 	public ObjectNode describeAsJSON() {
 		return toJSONNode(1);
@@ -640,14 +644,21 @@ public abstract class BNode {
 			fillLine(sheet.currentLine, method, sheet, out, fieldNameSize);
 			sheet.newLine();
 		});
-	}
 
-	private int fieldMaxLength() {
-		int[] max = { 0 };
-		forEachOutInFields(getClass(), BNode.class,
-				(f, out, readOnly) -> max[0] = Math.max(max[0], f.getName().length()));
-		forEachOutInMethods(getClass(), BNode.class, (m, out) -> max[0] = Math.max(max[0], m.getName().length()));
-		return max[0];
+		var actionsWithButtons = actions().stream().filter(Action::hasButtonOnKishanView).toList();
+
+		if (!actionsWithButtons.isEmpty()) {
+			sheet.newLine();
+
+			for (var a : actionsWithButtons) {
+				if (a.hasButtonOnKishanView()) {
+					var b = new JButton(a.whatItDoes());
+					b.setEnabled(a.applies());
+					b.addActionListener(e -> sheet.chat.append(a));
+					sheet.appendToCurrentLine(b);
+				}
+			}
+		}
 	}
 
 	private void fillLine(WrapPanel currentLine, Member m, ChatSheet sheet, BNode out, int left) {
@@ -714,7 +725,8 @@ public abstract class BNode {
 		c.setBorderWidth(border);
 		c.setOpaque(false);
 		c.setFocusable(false);
-		var tooltip = "<html>" + whatIsThis() + "<br><ul><li>" + idAsText() + "</ul></html>";
+		var tooltip = "<html>" + whatIsThis() + "<br><ul><li>" + idAsText() + "<li>" + getClass().getName()
+				+ "</ul></html>";
 		c.setToolTipText(tooltip);
 //		SelectableTooltip.addSelectableTooltip(c,tooltip);
 		Utils.idDropTarget(g(), c, droppedNode -> acceptDrop(droppedNode));

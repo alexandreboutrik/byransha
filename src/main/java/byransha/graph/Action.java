@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import byransha.nodes.primitive.LongNode;
 import byransha.nodes.system.ChatNode;
 import byransha.nodes.system.User;
+import byransha.ui.swing.ChatSheet;
 
 public abstract class Action<HOOK extends BNode> extends BNode {
 	public boolean stopRequested = false;
@@ -25,6 +26,7 @@ public abstract class Action<HOOK extends BNode> extends BNode {
 	public Consumer<Double> progressConsumer;
 	public JProgressBar progressBar;
 	public boolean confirmationRequired = false;
+	public boolean hasButtonOnKishanView = false;
 
 	public Action(HOOK parent, Class<? extends Category>... pathInMenu) {
 		super(parent);
@@ -39,6 +41,11 @@ public abstract class Action<HOOK extends BNode> extends BNode {
 			}
 		});
 		return r;
+	}
+	
+	@ActionMethod
+	public void run() {
+		execSync();
 	}
 
 	@Override
@@ -156,6 +163,10 @@ public abstract class Action<HOOK extends BNode> extends BNode {
 		} else {
 			return c;
 		}
+	}
+
+	public boolean hasButtonOnKishanView() {
+		return hasButtonOnKishanView;
 	}
 
 }

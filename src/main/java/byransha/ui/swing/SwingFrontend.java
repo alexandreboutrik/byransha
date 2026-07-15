@@ -40,7 +40,7 @@ public class SwingFrontend extends SystemNode {
 		g.userSwitchingListeners.add((formerUser, newUser) -> considerUser(newUser));
 
 		this.f = new JFrame();
-		f.setTitle("Byransha v" + g.byransha.versionNode.get() + " (contact: luc.hogie@cnrs.fr)");
+		f.setTitle("Byransha v" + g.byransha.versionNode.version + " (contact: luc.hogie@cnrs.fr)");
 		f.setLocation(0, 0);
 		f.setSize(9 * Utils.screenSize.height / 16, Utils.screenSize.height);
 		f.setVisible(true);

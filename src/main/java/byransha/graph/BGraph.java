@@ -130,11 +130,9 @@ public class BGraph extends BNode {
 
 					if (constr != null) {
 						r.add(g().indexes.byClass.getClassNodeFor(c));
-					} else {
-						System.err.println("class " + c + " does not have a constructor with a BGraph parameter");
 					}
 				} catch (NoSuchMethodException err) {
-					System.err.println("class " + c + " does not have a constructor with a BGraph parameter");
+					// Ignore classes without the required constructor
 				}
 			}
 		}

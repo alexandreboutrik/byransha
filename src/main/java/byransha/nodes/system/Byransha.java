@@ -1,25 +1,30 @@
 package byransha.nodes.system;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import byransha.VersionNode;
 import byransha.graph.BGraph;
 import byransha.graph.ShowInKishanView;
-import byransha.nodes.primitive.StringNode;
 import byransha.nodes.primitive.URLNode;
 import byransha.util.ByUtils;
 import byransha.util.Version;
 
 public class Byransha extends SystemNode {
-	public final StringNode remoteVersionNode = new StringNode(this, null, ".*");
+
 	@ShowInKishanView
 	public final URLNode sourceRepoURL = new URLNode(this, "https://github.com/lhogie/byransha");
 
@@ -28,14 +33,13 @@ public class Byransha extends SystemNode {
 	@ShowInKishanView
 	public static final File binDirectory = new File(homeDirectory, "bin");
 	@ShowInKishanView
-	public static final File jarDirectory = new File(binDirectory, "jar");
-	@ShowInKishanView
 	public static final String homepage = "https://webusers.i3s.unice.fr/~hogie/software/byransha/";
-	public static final String downloads = "https://webusers.i3s.unice.fr/~hogie/software/byransha/downloads/";
+	public static final String downloads = homepage + "/downloads/";
 	public static final String downloadBinaries = downloads + "bin/";
-	public static final String lastVersionURL = downloadBinaries + "last-version.txt";
+	public static final String lastVersionURL = downloadBinaries + "info.json";
 	public static byte[] currentExeBytes = "".getBytes();
-	public final StringNode versionNode = new StringNode(this, "0.0.1", "[0-9]+\\.[0-9]+\\.[0-9]+");
+	@ShowInKishanView
+	public final VersionNode versionNode = new VersionNode(this);
 
 	public Byransha(BGraph g) {
 		super(g);
@@ -44,33 +48,46 @@ public class Byransha extends SystemNode {
 			while (true) {
 				try {
 					var versionOnline = lastVersionOnline();
-					Version localVersion = new Version(versionNode.get());
 
-					if (versionOnline.isNewerThan(localVersion)) {
-						var zip = download(versionOnline);
-						Arrays.stream(jarDirectory.listFiles()).forEach(jar -> jar.delete());
-						extractZipByteArray(zip, jarDirectory);
+					if (versionOnline.isNewerThan(versionNode.version)) {
+						System.out.println("New version available: " + versionOnline);
 					}
 
 					Thread.sleep(10000);
-				} catch (IOException | InterruptedException e) {
+				} catch (IOException | InterruptedException | KeyManagementException | NoSuchAlgorithmException e) {
 					g().errorLog.add(e);
 				}
 			}
 		}, "check new version thread");// .start();
 	}
 
-	public Version lastVersionOnline() throws MalformedURLException, IOException {
-		return new Version(new String(new URL(lastVersionURL).openStream().readAllBytes()));
-	}
+	public Version lastVersionOnline() throws MalformedURLException, IOException, NoSuchAlgorithmException, KeyManagementException {
+		var v = new Version();
+		System.out.println(lastVersionURL);
+		// Before calling URL.openStream() at line 57:
+		TrustManager[] trustAllCerts = new TrustManager[]{
+		    new X509TrustManager() {
+		        public X509Certificate[] getAcceptedIssuers() { return null; }
+		        public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+		        public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+		    }
+		};
 
-	public byte[] download(Version v) throws MalformedURLException, IOException {
-		return new URL(downloadBinaries + "/byransha-" + v).openStream().readAllBytes();
+		SSLContext sc = SSLContext.getInstance("SSL");
+		sc.init(null, trustAllCerts, new java.security.SecureRandom());
+		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+		// Optional: Bypass hostname verification if the cert belongs to a different domain variant
+		HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+		var jsonString = new String(new URL(lastVersionURL).openStream().readAllBytes());
+		JsonNode rootNode = objectMapper.readTree(jsonString);
+		v.set(rootNode.get("version").asText());
+		return v;
 	}
 
 	@Override
 	public void createActions() {
-		cachedActions.elements.add(new Restart(this));
+		cachedActions.elements.add(new Update(this));
 		cachedActions.elements.add(new Deploy(this));
 		super.createActions();
 	}
@@ -84,20 +101,4 @@ public class Byransha extends SystemNode {
 	public String whatIsThis() {
 		return "Byransha";
 	}
-
-	public static void extractZipByteArray(byte[] zipData, File to) throws IOException {
-		to.mkdirs();
-
-		try (ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(zipData))) {
-			ZipEntry entry;
-
-			while ((entry = zis.getNextEntry()) != null) {
-				File f = new File(to, entry.getName());
-				Files.copy(zis, to.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			}
-
-			zis.closeEntry();
-		}
-	}
-
 }

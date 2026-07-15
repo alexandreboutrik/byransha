@@ -1,9 +1,10 @@
-package byransha.nodes.primitive;
+package byransha.nodes.primitive.file;
 
 import java.io.File;
 
 import byransha.graph.BNode;
 import byransha.graph.ShowInKishanView;
+import byransha.nodes.primitive.StringNode;
 
 public class FileNode extends BNode {
 	public File file;
@@ -20,13 +21,14 @@ public class FileNode extends BNode {
 
 	@ShowInKishanView
 	public StringNode name() {
-		return new StringNode(null, file.getName(), ".+");
+		return new StringNode(this, file.getName(), ".+");
 	}
 
 	@Override
 	public void createActions() {
 		cachedActions.elements.add(new openFile(this));
 		cachedActions.elements.add(new renameFile(this));
+		cachedActions.elements.add(new delete(this));
 		super.createActions();
 	}
 
