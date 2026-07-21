@@ -9,11 +9,10 @@ import byransha.nodes.primitive.StringNode;
 public class FileNode extends BNode {
 	public File file;
 
-
 	public FileNode(BNode g) {
 		super(g);
 	}
-	
+
 	public FileNode(BNode g, File f) {
 		super(g);
 		this.file = f;

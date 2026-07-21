@@ -1,6 +1,6 @@
 package byransha.nodes.lab;
 
 public class NodeInstantiationParameters {
-    public boolean persistent;
-    public int id = -1;
+	public boolean persistent;
+	public int id = -1;
 }

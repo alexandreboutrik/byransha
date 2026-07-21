@@ -32,6 +32,7 @@ public class SingleFileEventList extends InMemoryEventList {
 		return e;
 
 	}
+
 	@Override
 	public String toString() {
 		return whatIsThis();

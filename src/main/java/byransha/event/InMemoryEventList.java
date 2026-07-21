@@ -20,7 +20,7 @@ public class InMemoryEventList extends EventList {
 	public String toString() {
 		return whatIsThis();
 	}
-	
+
 	@Override
 	public void add(Event e) {
 		int index = Collections.binarySearch(q, e);

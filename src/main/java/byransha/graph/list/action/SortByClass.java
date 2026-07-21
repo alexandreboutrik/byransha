@@ -4,7 +4,7 @@ import byransha.graph.BNode;
 
 public class SortByClass extends Sort {
 
-	public SortByClass( ListNode inputNode) {
+	public SortByClass(ListNode inputNode) {
 		super(inputNode);
 	}
 

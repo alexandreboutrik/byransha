@@ -12,7 +12,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 public class ByID extends Index {
 	protected ByID(AllIndexes allIndexes) {
 		super(null);
-//		super(allIndexes);
+		// super(allIndexes);
 	}
 
 	private final Long2ObjectMap<BNode> m = new Long2ObjectOpenHashMap<>();

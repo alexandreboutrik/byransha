@@ -17,7 +17,7 @@ public abstract class BusinessNode extends BNode {
 	public ListNode<Issue> issues() {
 		return inverseRelation("issues", Issue.class, i -> i.relatedTo);
 	}
-	
+
 	@ActionMethod
 	public void reset() {
 		forEachOutInFields(getClass(), BNode.class, (f, o, ro) -> {

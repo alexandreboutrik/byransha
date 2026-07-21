@@ -24,7 +24,7 @@ public class ColorSchemeNode extends BNode {
 	public String toString() {
 		return style.name();
 	}
-	
+
 	public Color[] get() {
 		return ColorPalette.forStyle(style);
 	}

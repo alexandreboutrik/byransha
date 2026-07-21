@@ -50,38 +50,6 @@ public class TCPDriver extends IPDriver {
 			}
 		}, "network agent TCP reception thread").start();
 
-
-
-		new Thread(() -> {
-			try {
-				while (true) {
-
-					var client = socket.accept();
-
-					new Thread(() -> {
-						var from = client.getInetAddress();
-						var peer = na().findPeer(from);
-
-						try {
-							peer.out = new ObjectOutputStream(client.getOutputStream());
-							var is = new ObjectInputStream(client.getInputStream());
-
-							while (true) {
-								int len = is.readInt();
-								var compressed = is.readNBytes(len);
-								var uncompressed = GZip.gunzip(compressed);
-								var msg = (Message) g.serializer.fromBytes(uncompressed);
-								g.handle(msg);
-							}
-						} catch (IOException err) {
-							g().errorLog.add(err);
-						}
-					}).start();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}, "network agent discovery thread").start();
 	}
 
 	@Override
@@ -94,6 +62,6 @@ public class TCPDriver extends IPDriver {
 		var compressed = GZip.gzip(msgBytes);
 		to.out.writeInt(compressed.length);
 		to.out.write(compressed);
-//		to.out.flush();
+		// to.out.flush();
 	}
 }

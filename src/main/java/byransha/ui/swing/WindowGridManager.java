@@ -11,7 +11,7 @@ import javax.swing.JFrame;
 
 public class WindowGridManager {
 
-	public static void arrangeInGrid(List<JFrame> frames) {		
+	public static void arrangeInGrid(List<JFrame> frames) {
 		if (frames.isEmpty())
 			return;
 

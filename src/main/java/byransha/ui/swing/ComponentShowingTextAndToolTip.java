@@ -9,6 +9,4 @@ public interface ComponentShowingTextAndToolTip {
 
 	void setToolTipText(String s);
 
-	
-	
 }

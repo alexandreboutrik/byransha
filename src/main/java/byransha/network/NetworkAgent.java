@@ -1,20 +1,14 @@
 package byransha.network;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.Properties;
 
 import byransha.event.Event;
 import byransha.graph.Ack;
@@ -53,73 +47,10 @@ public class NetworkAgent extends BNode {
 	public NetworkAgent(BGraph g, int tcpPort) throws FileNotFoundException, IOException {
 		super(g);
 		this.tcpDriver = new TCPDriver(this, tcpPort);
-
-		new Thread(() -> {
-			while (true) {
-				try {
-					for (File pd : Byransha.peersDirectory.listFiles()) {
-						if (pd.isDirectory()) {
-							var peer = findPeer(pd.getName());
-
-							if (peer == null) {
-								peer = new PeerNode(g, pd);
-								peers.elements.add(peer);
-							}
-						}
-					}
-					
-					Thread.sleep(1000);
-				} catch (IOException | InterruptedException e) {
-					g().errorLog.add(e);
-				}
-			}
-		}, "discover peers info on disk").start();
-		
-		new Thread(() -> {
-			while (true) {
-				try {
-					for (var p : peers.elements) {
-						if (p.out == null) {
-							p.setSocket( new Socket(p.address, p.port));
-						}
-					}
-					
-					Thread.sleep(1000);
-				} catch (IOException | InterruptedException e) {
-					g().errorLog.add(e);
-				}
-			}
-		}, "connect to peers").start();
-		
-
-		if (authorizedKeys.exists()) {
-			var props = new Properties();
-			props.load(new FileInputStream(authorizedKeys));
-
-			for (var e : props.entrySet()) {
-				var name = (String) e.getKey();
-				var base64key = (String) e.getValue();
-				byte[] der = Base64.getDecoder().decode(base64key);
-				X509EncodedKeySpec spec = new X509EncodedKeySpec(der);
-				try {
-					var pk = KeyFactory.getInstance("RSA").generatePublic(spec);
-					var p = new PeerNode(g);
-					p.name = name;
-					p.publicKey = pk;
-					peers.elements.add(p);
-				} catch (InvalidKeySpecException | NoSuchAlgorithmException err) {
-					g().errorLog.add(err);
-				}
-			}
-		} else {
-			authorizedKeys.getParentFile().mkdirs();
-			Files.write(authorizedKeys.toPath(), "".getBytes());
-		}
-
 		File keyPairFile = new File(securityDir, "keyPair.ser");
 
 		if (keyPairFile.exists()) {
-			keyPair = (KeyPair) serializer.fromBytes(Files.readAllBytes(keyPairFile.toPath()));
+			this.keyPair = (KeyPair) serializer.fromBytes(Files.readAllBytes(keyPairFile.toPath()));
 		} else {
 			System.out.println("Generating new random RSA keys");
 			keyPair = RSA.randomKeyPair();
@@ -129,6 +60,52 @@ public class NetworkAgent extends BNode {
 			System.out.println("public key: " + pub);
 			publicKeyInfo.set(pub);
 		}
+
+		new Thread(() -> {
+			while (true) {
+				try {
+					for (File peerDirectory : Byransha.peersDirectory.listFiles()) {
+						if (peerDirectory.isDirectory()) {
+							var peer = findPeer(peerDirectory.getName());
+
+							if (peer == null) {
+								try {
+									peer = new PeerNode(g, peerDirectory);
+									peers.elements.add(peer);
+								} catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+
+					Thread.sleep(990);
+				} catch (InterruptedException e) {
+					g().errorLog.add(e);
+				}
+			}
+		}, "discover peers info on disk").start();
+
+		new Thread(() -> {
+			while (true) {
+				try {
+					for (var p : peers.elements) {
+						if (p.out == null) {
+							try {
+								p.setSocket(new Socket(p.address, p.port));
+							} catch (IOException e) {
+								p.disconnect();
+								g().errorLog.add(e);
+							}
+						}
+					}
+
+					Thread.sleep(1012);
+				} catch (InterruptedException e) {
+					g().errorLog.add(e);
+				}
+			}
+		}, "connect to peers").start();
 
 	}
 

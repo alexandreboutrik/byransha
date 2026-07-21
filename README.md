@@ -23,7 +23,7 @@ business-centric applications. The platform is built on six core pillars:
 
 # Team
 - Luc Hogie (CNRS Research Engineer, leader and main contributor)
-- Dylan Malausena (Master 2 student, work on AI-powered data analysis)
+- Dylan Malaussena (Master 2 student, work on AI-powered data analysis)
 - Alexandre Boutrik (Master 1 student, work on security)
 
 ## former members

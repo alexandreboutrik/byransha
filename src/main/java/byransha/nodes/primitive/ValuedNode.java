@@ -83,12 +83,13 @@ public abstract class ValuedNode<V> extends BNode {
 		if (shouldGenerateEvent()) {
 			var g = g();
 			if (g.eventList != null) {
-//	g.eventList.add(new ValuedNodeValueChangeEvent<V>(g, LocalDateTime.now(), this, oldValue, newValue));
+				// g.eventList.add(new ValuedNodeValueChangeEvent<V>(g, LocalDateTime.now(),
+				// this, oldValue, newValue));
 			}
 		}
 
 		if (shownOnDisk) {
-//			writeValueToDisk();
+			// writeValueToDisk();
 		}
 	}
 

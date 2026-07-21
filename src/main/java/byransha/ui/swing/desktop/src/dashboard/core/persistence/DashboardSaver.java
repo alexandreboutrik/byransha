@@ -9,23 +9,23 @@ import com.google.gson.GsonBuilder;
 import byransha.ui.swing.desktop.src.dashboard.core.engine.DashboardLayout;
 
 public class DashboardSaver {
-    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private LayoutMapper mapper = new LayoutMapper();
+	private Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	private LayoutMapper mapper = new LayoutMapper();
 
-    public void saveToFile(DashboardLayout layout, String path) {
-        try {
-            DashboardLayoutSave saveModel = mapper.exportLayout(layout);
+	public void saveToFile(DashboardLayout layout, String path) {
+		try {
+			DashboardLayoutSave saveModel = mapper.exportLayout(layout);
 
-            String json = gson.toJson(saveModel);
+			String json = gson.toJson(saveModel);
 
-            FileWriter writer = new FileWriter(path);
-            writer.write(json);
-            writer.close();
+			FileWriter writer = new FileWriter(path);
+			writer.write(json);
+			writer.close();
 
-            System.out.println("Layout sauvegardé dans : " + path);
+			System.out.println("Layout sauvegardé dans : " + path);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

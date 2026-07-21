@@ -16,9 +16,6 @@ import byransha.nodes.system.Byransha;
 import byransha.nodes.system.JVMNode;
 import byransha.nodes.system.OSNode;
 import byransha.nodes.system.User;
-import byransha.security.AuthAction;
-import byransha.security.Authenticator;
-import byransha.security.LdapAuthenticator;
 import byransha.translate.GoogleTranslator;
 import byransha.translate.Translator;
 import byransha.ui.swing.SwingFrontend;
@@ -31,10 +28,6 @@ public class BGraph extends BNode {
 	public AllIndexes indexes = new AllIndexes(this);
 	@ShowInKishanView
 	public final AllIndexesNode indexesNode = new AllIndexesNode(this);
-
-	public Authenticator authenticatorMethod = new LdapAuthenticator(null, null, null, readOnly);
-	@ShowInKishanView
-	public AuthAction authenticator = new AuthAction(this);
 
 	@ShowInKishanView
 	public BNode application;
@@ -49,8 +42,8 @@ public class BGraph extends BNode {
 	@ShowInKishanView
 	public final EventList eventList = new SingleFileEventList(this,
 			new File(System.getProperty("user.home"), "byransha-events.bin"));
-//	public WebServer webServer;
-//	public ByranshaWebSocketServer webSocketServer;
+	// public WebServer webServer;
+	// public ByranshaWebSocketServer webSocketServer;
 
 	@ShowInKishanView
 	public SwingFrontend swing;
@@ -58,7 +51,7 @@ public class BGraph extends BNode {
 	public final NetworkAgent networkAgent;
 	@ShowInKishanView
 	public final Translator translator = new GoogleTranslator(this);
-//	public final Authenticate auth = new LdapAuthenticator(this);
+	// public final Authenticate auth = new LdapAuthenticator(this);
 
 	public final List<CurrentUserListener> userSwitchingListeners = new ArrayList<>();
 

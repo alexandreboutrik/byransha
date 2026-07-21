@@ -37,8 +37,8 @@ class OldTBRH {
 			person.firstName.set(l.set(3, ""));
 			person.birthDate.set(DataLake.parseDate(l.set(4, "")));
 			person.cityOfBirth.set(l.set(5, ""));
-//            person.etatCivil.countryOfBirth.set(l.set(6, null));
-//            person.etatCivil.nationality.set(l.set(7, null));
+			// person.etatCivil.countryOfBirth.set(l.set(6, null));
+			// person.etatCivil.nationality.set(l.set(7, null));
 			person.address.text.set(l.set(8, ""));
 			var inter = new PhoneNumberNode(person);
 			inter.set(l.set(9, ""));
@@ -104,9 +104,9 @@ class OldTBRH {
 				person.positions.elements.add(position); // new Position(graph);
 
 				var corps = l.set(i - 2, "");
-//                person.position.status = graph.find(Status(g), s ->
-//                    s.name.get().equals(corps)
-//                );
+				// person.position.status = graph.find(Status(g), s ->
+				// s.name.get().equals(corps)
+				// );
 
 				if (!startDate.isBlank()) {
 					var startDateNode = new DateNode(position);
@@ -143,7 +143,7 @@ class OldTBRH {
 		if (name.equals("laboratoire"))
 			name = "I3S";
 
-		if (name.equals("UNS")|| name.equals("UCA"))
+		if (name.equals("UNS") || name.equals("UCA"))
 			name = "UniCA";
 
 		String ss = name;

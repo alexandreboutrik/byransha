@@ -12,7 +12,7 @@ public class openFile extends ProcedureAction<FileNode> {
 
 	public openFile(FileNode f) {
 		super(f, file.class);
-		hasButtonOnKishanView=true;
+		hasButtonOnKishanView = true;
 	}
 
 	@Override

@@ -37,6 +37,6 @@ public final class Export extends FunctionAction<BNode, ListNode<TextNode>> {
 	@Override
 	public boolean applies() {
 		return true;
-//		return inputNode instanceof BusinessNode;
+		// return inputNode instanceof BusinessNode;
 	}
 }

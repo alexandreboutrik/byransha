@@ -5,7 +5,7 @@ import byransha.graph.list.action.FunctionAction;
 import byransha.graph.relection.LinkAction.type;
 
 public class MakeNewInstance extends FunctionAction<ClassNode, BNode> {
-//	@ShowInKishanView
+	// @ShowInKishanView
 	BNode parent = super.parent;
 
 	public MakeNewInstance(ClassNode inputNode) {

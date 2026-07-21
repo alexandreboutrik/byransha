@@ -12,13 +12,14 @@ public class Search extends FunctionAction<BNode, ListNode> {
 	@ShowInKishanView
 	public LongNode depth;
 
-	public static class search extends Category{}
-	
-	public Search( BNode src) {
-		super( src, search.class);
+	public static class search extends Category {
+	}
+
+	public Search(BNode src) {
+		super(src, search.class);
 		depth = new LongNode(this);
 		depth.set(1L);
-		depth.setBounds(new Bounds(0, 20));//src.computeLongestPathLength()));
+		depth.setBounds(new Bounds(0, 20));// src.computeLongestPathLength()));
 	}
 
 	@Override

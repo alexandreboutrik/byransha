@@ -6,11 +6,11 @@ import dev.langchain4j.model.ollama.OllamaChatModel;
 
 public class OllamaTranslate extends Translator {
 
-    private static final OllamaChatModel chatModel = OllamaChatModel.builder()
-            .baseUrl("http://localhost:11434")
-            .modelName("granite4:tiny-h")
-            .temperature(0.2)
-            .build();
+	private static final OllamaChatModel chatModel = OllamaChatModel.builder()
+			.baseUrl("http://localhost:11434")
+			.modelName("granite4:tiny-h")
+			.temperature(0.2)
+			.build();
 
 	public OllamaTranslate(BGraph g) {
 		super(g);

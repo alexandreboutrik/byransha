@@ -12,7 +12,7 @@ public class renameFile extends ProcedureAction<FileNode> {
 	public renameFile(FileNode inputNode) {
 		super(inputNode, file.class);
 		this.newName = new StringNode(this, inputNode.file.getName(), ".+");
-		hasButtonOnKishanView=true;
+		hasButtonOnKishanView = true;
 	}
 
 	@Override
