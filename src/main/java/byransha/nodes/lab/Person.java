@@ -77,7 +77,7 @@ public class Person extends BusinessNode {
 
 	@Override
 	public String toString() {
-		return firstName.toString() + " "+ name.toString();
+		return firstName.toString() + " " + name.toString();
 	}
 
 	@Override
@@ -87,7 +87,7 @@ public class Person extends BusinessNode {
 
 	@Override
 	public JComponent getListItemComponent(ChatNode chat) {
-		return new JLabel(firstName.get() + " "  + name.get());
+		return new JLabel(firstName.get() + " " + name.get());
 	}
 
 }

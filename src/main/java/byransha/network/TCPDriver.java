@@ -47,7 +47,7 @@ public class TCPDriver extends IPDriver {
 				e.printStackTrace();
 			}
 		}, "network agent TCP reception thread").start();
-		
+
 		new Thread(() -> {
 			try {
 				while (true) {
@@ -89,6 +89,6 @@ public class TCPDriver extends IPDriver {
 		var compressed = GZip.gzip(msgBytes);
 		to.out.writeInt(compressed.length);
 		to.out.write(compressed);
-//		to.out.flush();
+		// to.out.flush();
 	}
 }

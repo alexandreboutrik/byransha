@@ -7,10 +7,9 @@ import byransha.nodes.primitive.URLNode;
 public class CPU extends BNode {
 	LongNode nbCores;
 	URLNode url;
-	
+
 	public CPU(BNode parent) {
 		super(parent);
 	}
-
 
 }

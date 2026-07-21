@@ -27,11 +27,12 @@ public class CSV extends ArrayList<List<String>> {
 	}
 
 	public void check() {
-		for (var lineIndex = 0; lineIndex < size();++lineIndex) {
+		for (var lineIndex = 0; lineIndex < size(); ++lineIndex) {
 			var e = get(lineIndex);
-			
+
 			if (e.size() != headers.size())
-				throw new IllegalStateException("line " + lineIndex + " has length " + e.size() + " instead of " + headers.size());
+				throw new IllegalStateException(
+						"line " + lineIndex + " has length " + e.size() + " instead of " + headers.size());
 		}
 	}
 

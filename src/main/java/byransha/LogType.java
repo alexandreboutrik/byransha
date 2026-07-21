@@ -1,3 +1,5 @@
 package byransha;
 
-public enum LogType {ERR, WARNING}
+public enum LogType {
+	ERR, WARNING
+}

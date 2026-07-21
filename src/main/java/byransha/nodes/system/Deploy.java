@@ -57,7 +57,7 @@ public class Deploy extends Action<Byransha> {
 		var n = new ObjectNode(factory);
 		n.put("version", version.get());
 		n.put("date", LocalDateTime.now().toString());
-		n.put("java.version", System.getProperty("java.specification.version"));		
+		n.put("java.version", System.getProperty("java.specification.version"));
 		Files.writeString(versionFile.toPath(), n.toPrettyString());
 		scp(versionFile, scpHost.get(), scpRemoteDir.get() + "/info.json", username.get(), null);
 
@@ -79,8 +79,9 @@ public class Deploy extends Action<Byransha> {
 		/**
 		 * Flattens the current system classpath into a single large uber-jar. * @param
 		 * outputJar The destination path for the consolidated fat jar.
-		 * 
-		 * @throws IOException If file reading or writing fails.
+		 *
+		 * @throws IOException
+		 *                         If file reading or writing fails.
 		 */
 		public static void flattenClasspathToJar(File outputJar) throws IOException {
 			// 1. Get the current classpath string split by the OS path separator

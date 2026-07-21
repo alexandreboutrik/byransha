@@ -16,7 +16,7 @@ import byransha.ui.swing.RoundedBorder;
 
 public class ListItemPanel extends JPanel {
 	public final JCheckBox selectionBox = new JCheckBox();
-//	public final javax.swing.JLabel label;
+	// public final javax.swing.JLabel label;
 	private final ChatNode chat;
 	private final BNode node;
 
@@ -72,7 +72,7 @@ public class ListItemPanel extends JPanel {
 	}
 
 	public void showSelectionStatus(boolean selected) {
-		var thickness  = selected ? 4  : 1;
+		var thickness = selected ? 4 : 1;
 		setBorder(new RoundedBorder(node.getColor(), 10, thickness));
 	}
 }

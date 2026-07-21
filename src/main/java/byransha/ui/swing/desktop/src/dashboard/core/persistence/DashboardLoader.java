@@ -12,32 +12,34 @@ import byransha.ui.swing.desktop.src.dashboard.core.engine.DashboardLayout;
 import byransha.ui.swing.desktop.src.dashboard.core.model.LayoutNode;
 
 public class DashboardLoader {
-    
-    private Gson gson = new GsonBuilder().registerTypeAdapter(NodeSave.class, (JsonDeserializer<NodeSave>) (json, typeOfT, context) -> {
-        Map<String, Class<? extends NodeSave>> types = Map.of("panel", PanelSave.class, "split", SplitSave.class);
-        JsonObject obj = json.getAsJsonObject();
-        Class<? extends NodeSave> clazz = types.get(obj.get("type").getAsString());
-        return context.deserialize(obj, clazz);
-    }).create();
 
-    private LayoutMapper mapper = new LayoutMapper();
+	private Gson gson = new GsonBuilder()
+			.registerTypeAdapter(NodeSave.class, (JsonDeserializer<NodeSave>) (json, typeOfT, context) -> {
+				Map<String, Class<? extends NodeSave>> types = Map.of("panel", PanelSave.class, "split",
+						SplitSave.class);
+				JsonObject obj = json.getAsJsonObject();
+				Class<? extends NodeSave> clazz = types.get(obj.get("type").getAsString());
+				return context.deserialize(obj, clazz);
+			}).create();
 
-    public DashboardLayout loadFromFile(String path) {
-        try {
-            FileReader reader = new FileReader(path);
-            DashboardLayoutSave saveModel = gson.fromJson(reader, DashboardLayoutSave.class);
+	private LayoutMapper mapper = new LayoutMapper();
 
-            LayoutNode rootNode = mapper.fromSaveNode(saveModel.root);
+	public DashboardLayout loadFromFile(String path) {
+		try {
+			FileReader reader = new FileReader(path);
+			DashboardLayoutSave saveModel = gson.fromJson(reader, DashboardLayoutSave.class);
 
-            DashboardLayout layout = new DashboardLayout();
-            layout.setRoot(rootNode);
+			LayoutNode rootNode = mapper.fromSaveNode(saveModel.root);
 
-            System.out.println("Layout chargé depuis : " + path);
-            return layout;
+			DashboardLayout layout = new DashboardLayout();
+			layout.setRoot(rootNode);
 
-        } catch (Exception e) {
-            System.out.println("Erreur lors du chargement de la save, création d'un layout vide");
-            return new DashboardLayout();
-        }
-    }
+			System.out.println("Layout chargé depuis : " + path);
+			return layout;
+
+		} catch (Exception e) {
+			System.out.println("Erreur lors du chargement de la save, création d'un layout vide");
+			return new DashboardLayout();
+		}
+	}
 }

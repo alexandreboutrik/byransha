@@ -61,23 +61,31 @@ public class Byransha extends SystemNode {
 		}, "check new version thread");// .start();
 	}
 
-	public Version lastVersionOnline() throws MalformedURLException, IOException, NoSuchAlgorithmException, KeyManagementException {
+	public Version lastVersionOnline()
+			throws MalformedURLException, IOException, NoSuchAlgorithmException, KeyManagementException {
 		var v = new Version();
 		System.out.println(lastVersionURL);
 		// Before calling URL.openStream() at line 57:
-		TrustManager[] trustAllCerts = new TrustManager[]{
-		    new X509TrustManager() {
-		        public X509Certificate[] getAcceptedIssuers() { return null; }
-		        public void checkClientTrusted(X509Certificate[] certs, String authType) {}
-		        public void checkServerTrusted(X509Certificate[] certs, String authType) {}
-		    }
+		TrustManager[] trustAllCerts = new TrustManager[] {
+				new X509TrustManager() {
+					public X509Certificate[] getAcceptedIssuers() {
+						return null;
+					}
+
+					public void checkClientTrusted(X509Certificate[] certs, String authType) {
+					}
+
+					public void checkServerTrusted(X509Certificate[] certs, String authType) {
+					}
+				}
 		};
 
 		SSLContext sc = SSLContext.getInstance("SSL");
 		sc.init(null, trustAllCerts, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-		// Optional: Bypass hostname verification if the cert belongs to a different domain variant
+		// Optional: Bypass hostname verification if the cert belongs to a different
+		// domain variant
 		HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
 		var jsonString = new String(new URL(lastVersionURL).openStream().readAllBytes());
 		JsonNode rootNode = objectMapper.readTree(jsonString);

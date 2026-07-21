@@ -79,7 +79,8 @@ public class ByClass extends Index {
 		}
 
 		return new ClassNode(g, clazz);
-//		throw new IllegalStateException("class node should be registered: " + getClass());
+		// throw new IllegalStateException("class node should be registered: " +
+		// getClass());
 	}
 
 	@Override

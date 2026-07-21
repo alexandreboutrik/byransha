@@ -20,7 +20,7 @@ public class Shuffle extends ProcedureAction<ListNode> {
 	}
 
 	@Override
-	public void impl()  {
+	public void impl() {
 		inputNode.shuffle();
 	}
 

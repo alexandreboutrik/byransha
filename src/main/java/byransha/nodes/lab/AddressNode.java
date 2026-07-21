@@ -12,7 +12,6 @@ public class AddressNode extends BNode {
 		super(parent);
 	}
 
-	
 	@Override
 	public String toString() {
 		return text.toString();

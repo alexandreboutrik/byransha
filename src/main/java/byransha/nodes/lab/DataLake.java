@@ -123,10 +123,10 @@ public class DataLake extends BNode {
 		i3s.tutelles.elements.add(UniCA);
 
 		for (var n : List.of("COMRED", "SIS", "MDSC", "SPARKS")) {
-			var group = new ResearchGroup(i3s, n); 
+			var group = new ResearchGroup(i3s, n);
 			i3s.subStructures.elements.add(group);
 		}
-		
+
 		var adminGroup = new Structure(i3s);
 		adminGroup.name.set("SG/Administration");
 		i3s.subStructures.elements.add(adminGroup);
@@ -138,7 +138,6 @@ public class DataLake extends BNode {
 		var ds4h = new EUR(i3s);
 		ds4h.name.set("DS4H");
 		i3s.subStructures.elements.add(ds4h);
-
 
 		for (var n : List.of("ALGORITHMES", "Inria", "IUT Sophia", "Polytech", "Lucioles", "Valrose", "Fabron")) {
 			var campus = new Campus(UniCA); // new Campus(graph);

@@ -21,7 +21,7 @@ under the License.
 
 /* Contributors:
 
-Luc Hogie (CNRS, I3S laboratory, University of Nice-Sophia Antipolis) 
+Luc Hogie (CNRS, I3S laboratory, University of Nice-Sophia Antipolis)
 Aurelien Lancin (Coati research team, Inria)
 Christian Glacet (LaBRi, Bordeaux)
 David Coudert (Coati research team, Inria)
@@ -31,8 +31,8 @@ Issam Tahiri (Coati research team, Inria)
 Julien Fighiera (Aoste research team, Inria)
 Laurent Viennot (Gang research-team, Inria)
 Michel Syska (I3S, Université Cote D'Azur)
-Nathann Cohen (LRI, Saclay) 
-Julien Deantoin (I3S, Université Cote D'Azur, Saclay) 
+Nathann Cohen (LRI, Saclay)
+Julien Deantoin (I3S, Université Cote D'Azur, Saclay)
 
 */
 
@@ -81,8 +81,8 @@ public class JavaSerializer<E> extends Serializer<E> {
 	protected Object replaceAtDeserialization(Object obj) {
 		return obj;
 	}
-	
-	protected  Object replaceAtSerialization(Object obj) {
+
+	protected Object replaceAtSerialization(Object obj) {
 		return obj;
 	}
 

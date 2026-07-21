@@ -50,7 +50,7 @@ public class ErrorIndicator extends JLabel {
 
 	private void update() {
 		var errors = n.errors();
-		setText(errors.isEmpty() ? "" : errors.size()+"");
+		setText(errors.isEmpty() ? "" : errors.size() + "");
 		setToolTipText("<html>" + n.errors().size() + " error(s): <br><ul>");
 		n.errors().forEach(err -> setToolTipText(getToolTipText() + "<li>" + err.toString()));
 		setToolTipText(getToolTipText() + "</ul></html>");

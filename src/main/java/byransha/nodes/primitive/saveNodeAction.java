@@ -13,7 +13,7 @@ public final class saveNodeAction extends FunctionAction<TextNode, FileNode> {
 
 	protected saveNodeAction(TextNode textNode) {
 		super(textNode, file.class);
-		hasButtonOnKishanView=true;
+		hasButtonOnKishanView = true;
 	}
 
 	@Override

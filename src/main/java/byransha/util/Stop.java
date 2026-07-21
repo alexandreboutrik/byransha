@@ -6,5 +6,5 @@ public enum Stop {
 	public static Stop stopIf(boolean b) {
 		return b ? yes : no;
 	}
-	
+
 }

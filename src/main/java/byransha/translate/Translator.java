@@ -26,7 +26,7 @@ public abstract class Translator extends BNode {
 
 	@ShowInKishanView
 	final File translateDir;
-	
+
 	@ShowInKishanView
 	public final StringNode targetLanguage;
 	List<Dictionary> dictionaries = new ArrayList<>();
