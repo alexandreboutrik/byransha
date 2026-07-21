@@ -20,10 +20,11 @@ public class Main {
 	static BGraph g;
 
 	public static void main(String[] args) throws Throwable {
-//		System.out.println("IA".split("/").length);
+		// System.out.println("IA".split("/").length);
 
 		// java.awt.Toolkit.getDefaultToolkit();
-//		Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
+		// Application.setUserAgentStylesheet(new
+		// PrimerDark().getUserAgentStylesheet());
 		var argMap = mapArgs(args);
 
 		int port = argMap.containsKey("--port") ? Integer.parseInt(argMap.get("--port")) : TCPDriver.DEFAULT_PORT;
@@ -35,8 +36,10 @@ public class Main {
 
 		new ChatNode(g.currentUser()).append(g.application);
 
-//		new WebServer(g, Integer.parseInt(argMap.getOrDefault("--web-port", "8080")));
-//		new ShellServer(g, Integer.parseInt(argMap.getOrDefault("--telnet-port", "" + ShellServer.DEFAULT_PORT)));
+		// new WebServer(g, Integer.parseInt(argMap.getOrDefault("--web-port",
+		// "8080")));
+		// new ShellServer(g, Integer.parseInt(argMap.getOrDefault("--telnet-port", "" +
+		// ShellServer.DEFAULT_PORT)));
 
 		if (!argMap.containsKey("--no-gui")) {
 			new SwingFrontend(g);

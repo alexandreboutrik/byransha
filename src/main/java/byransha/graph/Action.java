@@ -42,7 +42,7 @@ public abstract class Action<HOOK extends BNode> extends BNode {
 		});
 		return r;
 	}
-	
+
 	@ActionMethod
 	public void run() {
 		execSync();

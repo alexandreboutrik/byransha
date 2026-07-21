@@ -21,7 +21,7 @@ under the License.
 
 /* Contributors:
 
-Luc Hogie (CNRS, I3S laboratory, University of Nice-Sophia Antipolis) 
+Luc Hogie (CNRS, I3S laboratory, University of Nice-Sophia Antipolis)
 Aurelien Lancin (Coati research team, Inria)
 Christian Glacet (LaBRi, Bordeaux)
 David Coudert (Coati research team, Inria)
@@ -31,8 +31,8 @@ Issam Tahiri (Coati research team, Inria)
 Julien Fighiera (Aoste research team, Inria)
 Laurent Viennot (Gang research-team, Inria)
 Michel Syska (I3S, Université Cote D'Azur)
-Nathann Cohen (LRI, Saclay) 
-Julien Deantoin (I3S, Université Cote D'Azur, Saclay) 
+Nathann Cohen (LRI, Saclay)
+Julien Deantoin (I3S, Université Cote D'Azur, Saclay)
 
 */
 
@@ -238,18 +238,18 @@ public class TextUtilities {
 	 * public static String toHumanString(final long n) { if (n < 0) { return "-" +
 	 * toHumanString( - n); } else if (n < 1000) { return String.valueOf(n); } else
 	 * { String s = String.valueOf(n); String units = "uKMGPH";
-	 * 
+	 *
 	 * int unit = (s.length() - 1) / 3;
-	 * 
+	 *
 	 * String a = s.substring(0, s.length() - 3 * unit);
-	 * 
+	 *
 	 * if (a.isEmpty()) { a = "0"; }
-	 * 
+	 *
 	 * String b = s.substring(s.length() - 3 * unit, s.length() - 3 * unit + 3 -
 	 * a.length());
-	 * 
+	 *
 	 * String u = unit > 0 ? String.valueOf(units.charAt(unit)) : "";
-	 * 
+	 *
 	 * return a + "." + b + u; } }
 	 */
 	public static class HumanNumber {
@@ -670,7 +670,7 @@ public class TextUtilities {
 
 		while (i.hasNext()) {
 			var e = i.next();
-//			System.out.println(e);
+			// System.out.println(e);
 
 			b.append(toString.apply(e));
 
@@ -748,7 +748,7 @@ public class TextUtilities {
 		 * calculated). (Note that the arrays aren't really copied anymore, just
 		 * switched...this is clearly much better than cloning an array or doing a
 		 * System.arraycopy() each time through the outer loop.)
-		 * 
+		 *
 		 * Effectively, the difference between the two implementations is this one does
 		 * not cause an out of memory condition when calculating the LD over two very
 		 * large strings.

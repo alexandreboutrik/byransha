@@ -27,7 +27,7 @@ final class Update extends ProcedureAction<Byransha> {
 		}
 
 		var jarFile = new File(elements[0]);
-		
+
 		System.exit(46); // tells the launch script to restart
 	}
 

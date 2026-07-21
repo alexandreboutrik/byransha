@@ -49,8 +49,8 @@ public class BGraph extends BNode {
 	@ShowInKishanView
 	public final EventList eventList = new SingleFileEventList(this,
 			new File(System.getProperty("user.home"), "byransha-events.bin"));
-//	public WebServer webServer;
-//	public ByranshaWebSocketServer webSocketServer;
+	// public WebServer webServer;
+	// public ByranshaWebSocketServer webSocketServer;
 
 	@ShowInKishanView
 	public SwingFrontend swing;
@@ -58,7 +58,7 @@ public class BGraph extends BNode {
 	public final NetworkAgent networkAgent;
 	@ShowInKishanView
 	public final Translator translator = new GoogleTranslator(this);
-//	public final Authenticate auth = new LdapAuthenticator(this);
+	// public final Authenticate auth = new LdapAuthenticator(this);
 
 	public final List<CurrentUserListener> userSwitchingListeners = new ArrayList<>();
 

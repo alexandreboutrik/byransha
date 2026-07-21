@@ -76,7 +76,6 @@ public abstract class BNode {
 	final public static JsonNodeFactory factory = new JsonNodeFactory(true);
 	final public static ObjectMapper objectMapper = new ObjectMapper();
 
-	
 	public final BNode parent;
 	public boolean readOnly;
 	protected boolean resilient = false;
@@ -367,8 +366,6 @@ public abstract class BNode {
 		});
 	}
 
-	
-
 	public void forEachOutInMethods(Class<? extends BNode> from, Class<? extends BNode> until,
 			BiConsumer<Method, BNode> consumer) {
 		for (var m : getClass().getMethods()) {
@@ -417,7 +414,7 @@ public abstract class BNode {
 	}
 
 	public void createActions() {
-//		cachedActions.add(new Back(g, this));
+		// cachedActions.add(new Back(g, this));
 		cachedActions.elements.add(new QueryIA(this));
 		cachedActions.elements.add(new SeeClassNode(this));
 		cachedActions.elements.add(new CopyIDToClipboard(this));
@@ -568,7 +565,6 @@ public abstract class BNode {
 			}
 		});
 	}
-
 
 	public ObjectNode describeAsJSON() {
 		return toJSONNode(1);
@@ -728,7 +724,7 @@ public abstract class BNode {
 		var tooltip = "<html>" + whatIsThis() + "<br><ul><li>" + idAsText() + "<li>" + getClass().getName()
 				+ "</ul></html>";
 		c.setToolTipText(tooltip);
-//		SelectableTooltip.addSelectableTooltip(c,tooltip);
+		// SelectableTooltip.addSelectableTooltip(c,tooltip);
 		Utils.idDropTarget(g(), c, droppedNode -> acceptDrop(droppedNode));
 
 		DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(c, DnDConstants.ACTION_COPY,

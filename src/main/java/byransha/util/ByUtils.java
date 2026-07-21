@@ -15,8 +15,6 @@ import io.github.classgraph.ClassGraph;
 
 public class ByUtils {
 
-	
-	
 	public static final File home = new File(System.getProperty("user.home"));
 
 	public static final Map<Class, Integer> sizeOfPrimitive = new HashMap();
@@ -33,15 +31,16 @@ public class ByUtils {
 	}
 
 	public static String camelToWords(String text) {
-	    if (text == null || text.isBlank()) return text;
+		if (text == null || text.isBlank())
+			return text;
 
-	    // 1. Ajoute un espace avant chaque majuscule
-	    String result = text.replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase();
-	    
-	    // 2. Met la première lettre en majuscule (Optionnel)
-	    return result.substring(0, 1).toUpperCase() + result.substring(1);
+		// 1. Ajoute un espace avant chaque majuscule
+		String result = text.replaceAll("([a-z])([A-Z])", "$1 $2").toLowerCase();
+
+		// 2. Met la première lettre en majuscule (Optionnel)
+		return result.substring(0, 1).toUpperCase() + result.substring(1);
 	}
-	
+
 	public static Field findField(Class<?> clazz, String fieldName) throws NoSuchFieldException {
 		try {
 			var field = clazz.getDeclaredField(fieldName);
@@ -99,7 +98,7 @@ public class ByUtils {
 		if (!b)
 			throw new IllegalStateException();
 	}
-	
+
 	public static String ms2string(long ms) {
 		if (ms < 1000) {
 			return ms + "ms";
@@ -111,6 +110,7 @@ public class ByUtils {
 			return String.format("%.2fh", ms / (60 * 60 * 1000.0));
 		}
 	}
+
 	public static int sizeOfObject(Object o) {
 		if (o == null) {
 			return 0;
@@ -177,10 +177,10 @@ public class ByUtils {
 	}
 
 	public static String toHex(Color color) {
-        // %02X means: 2-digit hex, uppercase, padded with 0 if needed
-        return String.format("#%02X%02X%02X", 
-                             color.getRed(), 
-                             color.getGreen(), 
-                             color.getBlue());
-    }
+		// %02X means: 2-digit hex, uppercase, padded with 0 if needed
+		return String.format("#%02X%02X%02X",
+				color.getRed(),
+				color.getGreen(),
+				color.getBlue());
+	}
 }

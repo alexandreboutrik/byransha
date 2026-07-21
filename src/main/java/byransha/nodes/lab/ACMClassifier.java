@@ -32,7 +32,6 @@ public class ACMClassifier extends BusinessNode {
 		super(g);
 	}
 
-
 	@Override
 	public String toString() {
 		return code + ": " + descr;

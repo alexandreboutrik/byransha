@@ -49,7 +49,7 @@ public class MenuBuilder {
 	private static void sort(JComponent c) {
 		var l = Arrays.stream(c.getComponents()).map(cc -> (AbstractButton) cc)
 				.sorted((a, b) -> a.getText().compareTo(b.getText())).toList();
-//		l.forEach(cc -> sort(cc));
+		// l.forEach(cc -> sort(cc));
 		c.removeAll();
 		l.forEach(cc -> c.add(cc));
 	}

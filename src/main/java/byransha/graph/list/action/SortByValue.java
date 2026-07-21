@@ -5,8 +5,8 @@ import byransha.nodes.primitive.ValuedNode;
 
 public class SortByValue extends Sort {
 
-	public SortByValue( ListNode inputNode) {
-		super( inputNode);
+	public SortByValue(ListNode inputNode) {
+		super(inputNode);
 	}
 
 	@Override

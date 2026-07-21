@@ -10,15 +10,13 @@ import byransha.graph.Index;
 import byransha.util.Stop;
 
 public class NodeList extends Index {
-	 public NodeList(AllIndexes allIndexes) {
-		 super(null);
-//		super(allIndexes);
+	public NodeList(AllIndexes allIndexes) {
+		super(null);
+		// super(allIndexes);
 		// TODO Auto-generated constructor stub
 	}
 
-	 final List<BNode> l = new ArrayList<>();
-
-	
+	final List<BNode> l = new ArrayList<>();
 
 	public BNode forEachNode(Function<BNode, Stop> f) {
 		for (BNode node : l) {
@@ -30,7 +28,6 @@ public class NodeList extends Index {
 		return null;
 	}
 
-	
 	@Override
 	public void add(BNode n) {
 		l.add(n);
@@ -41,7 +38,6 @@ public class NodeList extends Index {
 		l.remove(n);
 	}
 
-
 	@Override
 	public String strategy() {
 		return "list of nodes";
@@ -50,7 +46,7 @@ public class NodeList extends Index {
 	public long size() {
 		return l.size();
 	}
-	
+
 	public Stream<BNode> stream() {
 		return l.stream();
 	}

@@ -50,7 +50,7 @@ public class NetworkAgent extends BNode {
 
 	public NetworkAgent(BGraph g, int tcpPort) throws FileNotFoundException, IOException {
 		super(g);
-		this. tcpDriver = new TCPDriver(this, tcpPort);
+		this.tcpDriver = new TCPDriver(this, tcpPort);
 		if (authorizedKeys.exists()) {
 			var props = new Properties();
 			props.load(new FileInputStream(authorizedKeys));
@@ -92,7 +92,7 @@ public class NetworkAgent extends BNode {
 	}
 
 	@Override
-	protected synchronized void handle(Message msg)  {
+	protected synchronized void handle(Message msg) {
 		++nbMessagesReceived;
 		updateInOutInfo();
 
@@ -125,9 +125,10 @@ public class NetworkAgent extends BNode {
 			if (from != null) {
 				from.TokensPerSecond = t.tokensPerSecond;
 				from.IsComputing = t.isComputing;
-                from.promptLag = t.promptLag;
-                from.queueSize = t.queueSize;
-                if (t.alpha > 0) from.alpha = t.alpha;
+				from.promptLag = t.promptLag;
+				from.queueSize = t.queueSize;
+				if (t.alpha > 0)
+					from.alpha = t.alpha;
 			}
 		} else {
 			throw new IllegalStateException("received " + received.getClass());
@@ -194,8 +195,8 @@ public class NetworkAgent extends BNode {
 	public String toString() {
 		return "received: " + nbMessagesReceived + ", sent: " + packetSent;
 	}
-	
+
 	public java.security.PublicKey getPublicKey() {
-    	return this.keyPair != null ? this.keyPair.getPublic() : null;
-}
+		return this.keyPair != null ? this.keyPair.getPublic() : null;
+	}
 }

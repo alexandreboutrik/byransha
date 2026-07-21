@@ -78,7 +78,7 @@ public abstract class DistributionNode<V> extends BNode {
 		plot.setOutlineVisible(false); // remove plot border
 		plot.setShadowPaint(new Color(0, 0, 0, 0)); // remove shadow
 
-//Make ChartPanel transparent too
+		// Make ChartPanel transparent too
 		ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setOpaque(false);
 		chartPanel.setBackground(new Color(0, 0, 0, 0));

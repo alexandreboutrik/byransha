@@ -4,19 +4,19 @@ import java.util.UUID;
 
 public class PanelNode extends LayoutNode {
 
-    private String panelName;
+	private String panelName;
 
-    public PanelNode(String panelName) {
-        this.id = UUID.randomUUID().toString();
-        this.panelName = panelName;
-    }
+	public PanelNode(String panelName) {
+		this.id = UUID.randomUUID().toString();
+		this.panelName = panelName;
+	}
 
-    public String getPanelName() {
-        return panelName;
-    }
+	public String getPanelName() {
+		return panelName;
+	}
 
-    @Override
-    public String toString() {
-        return "Panel(" + panelName + ")";
-    }
+	@Override
+	public String toString() {
+		return "Panel(" + panelName + ")";
+	}
 }

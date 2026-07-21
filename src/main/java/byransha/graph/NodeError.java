@@ -8,7 +8,7 @@ public class NodeError {
 		this.node = node;
 		this.msg = msg;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "error in " + node + ": " + msg;

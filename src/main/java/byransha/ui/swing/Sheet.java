@@ -19,8 +19,9 @@ public class Sheet extends JPanel implements Scrollable {
 	Color bgColor;
 
 	// private final ChatNode chat;
-//	int colorIndex;
-//	Color[] backgroundColors = new Color[] { Color.white, new Color(0xEE, 0xEE, 0xEE, 10) };
+	// int colorIndex;
+	// Color[] backgroundColors = new Color[] { Color.white, new Color(0xEE, 0xEE,
+	// 0xEE, 10) };
 
 	public Sheet() {
 		super();

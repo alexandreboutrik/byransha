@@ -22,12 +22,10 @@ public class User extends BNode {
 		passwordNode.hideText = true;
 	}
 
-
 	@Override
 	public String whatIsThis() {
 		return "a user of the system";
 	}
-
 
 	public boolean accept(String username, String p) {
 		return name.get().equals(username) && passwordNode.get().equals(p);
