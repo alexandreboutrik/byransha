@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.nio.file.Files;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -50,7 +52,46 @@ public class NetworkAgent extends BNode {
 
 	public NetworkAgent(BGraph g, int tcpPort) throws FileNotFoundException, IOException {
 		super(g);
-		this. tcpDriver = new TCPDriver(this, tcpPort);
+		this.tcpDriver = new TCPDriver(this, tcpPort);
+
+		new Thread(() -> {
+			while (true) {
+				try {
+					for (File pd : Byransha.peersDirectory.listFiles()) {
+						if (pd.isDirectory()) {
+							var peer = findPeer(pd.getName());
+
+							if (peer == null) {
+								peer = new PeerNode(g, pd);
+								peers.elements.add(peer);
+							}
+						}
+					}
+					
+					Thread.sleep(1000);
+				} catch (IOException | InterruptedException e) {
+					g().errorLog.add(e);
+				}
+			}
+		}, "discover peers info on disk").start();
+		
+		new Thread(() -> {
+			while (true) {
+				try {
+					for (var p : peers.elements) {
+						if (p.out == null) {
+							p.setSocket( new Socket(p.address, p.port));
+						}
+					}
+					
+					Thread.sleep(1000);
+				} catch (IOException | InterruptedException e) {
+					g().errorLog.add(e);
+				}
+			}
+		}, "connect to peers").start();
+		
+
 		if (authorizedKeys.exists()) {
 			var props = new Properties();
 			props.load(new FileInputStream(authorizedKeys));
@@ -92,7 +133,7 @@ public class NetworkAgent extends BNode {
 	}
 
 	@Override
-	protected synchronized void handle(Message msg)  {
+	protected synchronized void handle(Message msg) {
 		++nbMessagesReceived;
 		updateInOutInfo();
 
@@ -125,9 +166,10 @@ public class NetworkAgent extends BNode {
 			if (from != null) {
 				from.TokensPerSecond = t.tokensPerSecond;
 				from.IsComputing = t.isComputing;
-                from.promptLag = t.promptLag;
-                from.queueSize = t.queueSize;
-                if (t.alpha > 0) from.alpha = t.alpha;
+				from.promptLag = t.promptLag;
+				from.queueSize = t.queueSize;
+				if (t.alpha > 0)
+					from.alpha = t.alpha;
 			}
 		} else {
 			throw new IllegalStateException("received " + received.getClass());
@@ -194,8 +236,8 @@ public class NetworkAgent extends BNode {
 	public String toString() {
 		return "received: " + nbMessagesReceived + ", sent: " + packetSent;
 	}
-	
+
 	public java.security.PublicKey getPublicKey() {
-    	return this.keyPair != null ? this.keyPair.getPublic() : null;
-}
+		return this.keyPair != null ? this.keyPair.getPublic() : null;
+	}
 }

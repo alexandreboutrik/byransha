@@ -1,7 +1,11 @@
 package byransha.network;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.security.PublicKey;
 
 import byransha.graph.BGraph;
@@ -12,15 +16,19 @@ public class PeerNode extends BNode {
 	public PublicKey publicKey;
 	public int port;
 	public String name;
-	public ObjectOutputStream out;
 	public double TokensPerSecond;
 	public boolean IsComputing;
 	public double promptLag;
 	public int queueSize;
 	public double alpha = 1.0;
+	private ObjectInputStream in;
+	public ObjectOutputStream out;
+	private Socket socket;
 
-	public PeerNode(BGraph g) {
+	public PeerNode(BGraph g, File directory) {
 		super(g);
+		this.name = directory.getName();
+		this.publicKey = PrivateKeyUtils.
 	}
 
 	public double getTokensPerSecond() {
@@ -56,5 +64,30 @@ public class PeerNode extends BNode {
 	public double getScore() {
 		// calculer Score P2P
 		return (TokensPerSecond * alpha) / ((1 + queueSize) * (1 + promptLag));
+	}
+
+	public void setSocket(Socket socket) throws IOException {
+		this.socket = socket;
+		out = new ObjectOutputStream(socket.getOutputStream());
+		in = new ObjectInputStream(socket.getInputStream());
+	}
+
+	public void disconnect() {
+		try {
+			if (in != null) {
+				in.close();
+				in = null;
+			}
+			if (out != null) {
+				out.close();
+				out = null;
+			}
+			if (socket != null) {
+				socket.close();
+				socket = null;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
