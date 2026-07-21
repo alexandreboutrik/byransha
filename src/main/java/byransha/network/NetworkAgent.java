@@ -42,15 +42,15 @@ public class NetworkAgent extends BNode {
 	public final ListNode<PeerNode> peers = new ListNode<>(this, "peers", PeerNode.class);
 	@ShowInKishanView
 	String peerName;
-	private int packetReceived;
+	private int nbMessagesReceived;
 	private int packetSent;
 	private KeyPair keyPair;
-	IPDriver tcpDriver = new TCPDriver(this);
+	IPDriver tcpDriver;
 	final Serializer serializer = new JavaSerializer<>();
 
-	public NetworkAgent(BGraph g) throws FileNotFoundException, IOException {
+	public NetworkAgent(BGraph g, int tcpPort) throws FileNotFoundException, IOException {
 		super(g);
-
+		this. tcpDriver = new TCPDriver(this, tcpPort);
 		if (authorizedKeys.exists()) {
 			var props = new Properties();
 			props.load(new FileInputStream(authorizedKeys));
@@ -92,8 +92,8 @@ public class NetworkAgent extends BNode {
 	}
 
 	@Override
-	protected void handle(Message msg)  {
-		++packetReceived;
+	protected synchronized void handle(Message msg)  {
+		++nbMessagesReceived;
 		updateInOutInfo();
 
 		var from = findPeer(msg.route.getLast());
@@ -176,7 +176,7 @@ public class NetworkAgent extends BNode {
 	}
 
 	private void updateInOutInfo() {
-		inOutInfo.set(packetReceived + " received, " + packetSent + " sent");
+		inOutInfo.set(nbMessagesReceived + " received, " + packetSent + " sent");
 	}
 
 	public synchronized void send(Object o) throws IOException {
@@ -192,7 +192,7 @@ public class NetworkAgent extends BNode {
 
 	@Override
 	public String toString() {
-		return "received: " + packetReceived + ", sent: " + packetSent;
+		return "received: " + nbMessagesReceived + ", sent: " + packetSent;
 	}
 	
 	public java.security.PublicKey getPublicKey() {

@@ -17,6 +17,11 @@
 	</repositories>
 	<dependencies>
 		<dependency>
+			<groupId>com.github.alexandreboutrik</groupId>
+			<artifactId>jfabe</artifactId>
+			<version>v1.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk18on</artifactId>
 			<version>1.78</version>
@@ -79,7 +84,7 @@
 			<version>5.14.0</version>
 		</dependency>
 
-		
+
 		<!-- Source: https://mvnrepository.com/artifact/org.jfree/jfreechart -->
 		<dependency>
 			<groupId>org.jfree</groupId>
