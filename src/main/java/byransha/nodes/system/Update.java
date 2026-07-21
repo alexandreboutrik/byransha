@@ -1,5 +1,7 @@
 package byransha.nodes.system;
 
+import java.io.File;
+
 import byransha.graph.Category;
 import byransha.graph.ProcedureAction;
 
@@ -18,11 +20,20 @@ final class Update extends ProcedureAction<Byransha> {
 
 	@Override
 	public void impl() throws Throwable {
-		System.exit(46); // tells the launch script to update the binaries
+		var elements = System.getProperty("java.classpath").split(System.getProperty("path.separator"));
+
+		if (elements.length != 1) {
+			throw new IllegalStateException("Update can only be called from a jar file");
+		}
+
+		var jarFile = new File(elements[0]);
+		
+		System.exit(46); // tells the launch script to restart
 	}
 
 	@Override
 	public boolean applies() {
-		return true;
+		// only applies if the program is running from a jar file
+		return System.getProperty("java.classpath").split(System.getProperty("path.separator")).length == 1;
 	}
 }

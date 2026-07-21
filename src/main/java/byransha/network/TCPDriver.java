@@ -1,19 +1,19 @@
 package byransha.network;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 
 import byransha.util.GZip;
 
 public class TCPDriver extends IPDriver {
-	public static final int port = 9876;
+	public static final int DEFAULT_PORT = 9876;
 	ServerSocket socket;
 
-	public TCPDriver(NetworkAgent g) throws FileNotFoundException, IOException {
-		super(g);
+	public TCPDriver(NetworkAgent g, int port) throws FileNotFoundException, IOException {
+		super(g, port);
 
 		new Thread(() -> {
 			try {
@@ -26,19 +26,19 @@ public class TCPDriver extends IPDriver {
 					new Thread(() -> {
 						var from = client.getInetAddress();
 						var peer = na().findPeer(from);
-						
+
 						try {
-							peer.out = new DataOutputStream(client.getOutputStream());
-							var is = new DataInputStream(client.getInputStream());
+							peer.out = new ObjectOutputStream(client.getOutputStream());
+							var is = new ObjectInputStream(client.getInputStream());
 
 							while (true) {
 								int len = is.readInt();
-								var bytes = is.readNBytes(len);
-								var msg = (Message) g.serializer.fromBytes(GZip.gunzip(bytes));
+								var compressed = is.readNBytes(len);
+								var uncompressed = GZip.gunzip(compressed);
+								var msg = (Message) g.serializer.fromBytes(uncompressed);
 								g.handle(msg);
 							}
-						}
-						catch (IOException err) {
+						} catch (IOException err) {
 							g().errorLog.add(err);
 						}
 					}).start();
@@ -46,7 +46,37 @@ public class TCPDriver extends IPDriver {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}, "network agent UDP reception thread").start();
+		}, "network agent TCP reception thread").start();
+		
+		new Thread(() -> {
+			try {
+				while (true) {
+					var client = socket.accept();
+
+					new Thread(() -> {
+						var from = client.getInetAddress();
+						var peer = na().findPeer(from);
+
+						try {
+							peer.out = new ObjectOutputStream(client.getOutputStream());
+							var is = new ObjectInputStream(client.getInputStream());
+
+							while (true) {
+								int len = is.readInt();
+								var compressed = is.readNBytes(len);
+								var uncompressed = GZip.gunzip(compressed);
+								var msg = (Message) g.serializer.fromBytes(uncompressed);
+								g.handle(msg);
+							}
+						} catch (IOException err) {
+							g().errorLog.add(err);
+						}
+					}).start();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}, "network agent discovery thread").start();
 	}
 
 	@Override
@@ -56,8 +86,9 @@ public class TCPDriver extends IPDriver {
 
 	@Override
 	public void send(byte[] msgBytes, PeerNode to) throws IOException {
-		to.out.writeInt(msgBytes.length);
-		to.out.write(msgBytes);
+		var compressed = GZip.gzip(msgBytes);
+		to.out.writeInt(compressed.length);
+		to.out.write(compressed);
 //		to.out.flush();
 	}
 }

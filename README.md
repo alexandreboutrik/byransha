@@ -1,7 +1,7 @@
 Install: 
 On Windows: [Download the launch script](https://webusers.i3s.unice.fr/~hogie/software/byransha/downloads/bin/run.ps1)
 
-Alternatively you can  [download the self-contained JAR file](https://webusers.i3s.unice.fr/~hogie/software/byransha/downloads/bin/byransha.jar) and run it with the command: `java -jar byransha.jar`
+Alternatively you can download the self-contained JAR file from [here](https://webusers.i3s.unice.fr/~hogie/software/byransha//downloads/bin/) and run it with the command: `java -jar byransha.jar`
 
 
 

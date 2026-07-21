@@ -1,6 +1,6 @@
 package byransha.network;
 
-import java.io.DataOutputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.security.PublicKey;
 
@@ -12,21 +12,32 @@ public class PeerNode extends BNode {
 	public PublicKey publicKey;
 	public int port;
 	public String name;
-	public DataOutputStream out;
+	public ObjectOutputStream out;
 	public double TokensPerSecond;
 	public boolean IsComputing;
-    public double promptLag;
-    public int queueSize;
-    public double alpha = 1.0;
+	public double promptLag;
+	public int queueSize;
+	public double alpha = 1.0;
 
 	public PeerNode(BGraph g) {
 		super(g);
 	}
 
-    public double getTokensPerSecond() { return TokensPerSecond; }
-    public double getPromptLagMsPerToken() { return promptLag; }
-    public int getCurrentQueueSize() { return queueSize; }
-    public double getAlpha() { return alpha; }
+	public double getTokensPerSecond() {
+		return TokensPerSecond;
+	}
+
+	public double getPromptLagMsPerToken() {
+		return promptLag;
+	}
+
+	public int getCurrentQueueSize() {
+		return queueSize;
+	}
+
+	public double getAlpha() {
+		return alpha;
+	}
 
 	@Override
 	public String whatIsThis() {

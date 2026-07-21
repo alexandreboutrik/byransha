@@ -51,10 +51,11 @@ public class BGraph extends BNode {
 			new File(System.getProperty("user.home"), "byransha-events.bin"));
 //	public WebServer webServer;
 //	public ByranshaWebSocketServer webSocketServer;
+
 	@ShowInKishanView
 	public SwingFrontend swing;
 	@ShowInKishanView
-	public final NetworkAgent networkAgent = new NetworkAgent(this);
+	public final NetworkAgent networkAgent;
 	@ShowInKishanView
 	public final Translator translator = new GoogleTranslator(this);
 //	public final Authenticate auth = new LdapAuthenticator(this);
@@ -64,10 +65,10 @@ public class BGraph extends BNode {
 	class graph extends Category {
 	}
 
-	public BGraph(File directory) throws Exception {
+	public BGraph(File directory, int port) throws Exception {
 		super(null);
 		// indexes.add(this);
-
+		this.networkAgent = new NetworkAgent(this, port);
 		new Male(this);
 		new Female(this);
 		new NotGenred(this);

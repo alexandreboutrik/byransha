@@ -6,13 +6,13 @@ import java.io.IOException;
 import byransha.graph.BNode;
 
 public abstract class IPDriver extends BNode {
-	public static final int port = 9876;
+	public final int port;
 	protected int packetReceived;
 	protected int packetSent;
 
-	public IPDriver(NetworkAgent g) throws FileNotFoundException, IOException {
+	public IPDriver(NetworkAgent g, int port) throws FileNotFoundException, IOException {
 		super(g);
-
+		this.port = port;
 	}
 
 	public NetworkAgent na() {
