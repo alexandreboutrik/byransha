@@ -10,8 +10,7 @@ import javax.crypto.SecretKey;
 /**
  * Local "Node State" and "Wallet Manager".
  * Manages a node's local cryptographic state using a secure
- * PKCS12 KeyStore. Ensures the node's local database encryption key
- * is protected by the node's passphrase.
+ * PKCS12 KeyStore.
  */
 public class HardwareKey {
 
@@ -19,10 +18,8 @@ public class HardwareKey {
 	private static final String KEYSTORE_FILE = "node_wallet.p12";
 	private static final String KEY_ALIAS = "node_local_encryption_key";
 
-	public static SecretKey derive(char[] passphrase) throws Exception {
-		if (passphrase == null || passphrase.length == 0) {
-			throw new IllegalArgumentException("Node operator must provide a valid passphrase.");
-		}
+	public static SecretKey derive() throws Exception {
+		char[] passphrase = getUnattendedPassphrase();
 
 		File ksFile = new File(KEYSTORE_FILE);
 		KeyStore keyStore = KeyStore.getInstance(KEYSTORE_TYPE);
@@ -33,6 +30,18 @@ public class HardwareKey {
 		}
 
 		return generateAndStoreKey(ksFile, keyStore, passphrase, keyPassword);
+	}
+
+	/**
+	 * Fetches the passphrase from the environment or returns a default.
+	 */
+	private static char[] getUnattendedPassphrase() {
+		String envPass = System.getenv("NODE_WALLET_PASSWORD");
+		if (envPass != null && !envPass.isBlank()) {
+			return envPass.toCharArray();
+		}
+		// Fallback
+		return "default_unattended_node_passphrase".toCharArray();
 	}
 
 	/**
