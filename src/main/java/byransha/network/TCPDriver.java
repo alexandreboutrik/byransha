@@ -1,11 +1,13 @@
 package byransha.network;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 
+import byransha.nodes.system.Byransha;
 import byransha.util.GZip;
 
 public class TCPDriver extends IPDriver {
@@ -48,35 +50,6 @@ public class TCPDriver extends IPDriver {
 			}
 		}, "network agent TCP reception thread").start();
 
-		new Thread(() -> {
-			try {
-				while (true) {
-					var client = socket.accept();
-
-					new Thread(() -> {
-						var from = client.getInetAddress();
-						var peer = na().findPeer(from);
-
-						try {
-							peer.out = new ObjectOutputStream(client.getOutputStream());
-							var is = new ObjectInputStream(client.getInputStream());
-
-							while (true) {
-								int len = is.readInt();
-								var compressed = is.readNBytes(len);
-								var uncompressed = GZip.gunzip(compressed);
-								var msg = (Message) g.serializer.fromBytes(uncompressed);
-								g.handle(msg);
-							}
-						} catch (IOException err) {
-							g().errorLog.add(err);
-						}
-					}).start();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}, "network agent discovery thread").start();
 	}
 
 	@Override

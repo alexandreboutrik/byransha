@@ -33,6 +33,8 @@ public class Byransha extends SystemNode {
 	@ShowInKishanView
 	public static final File binDirectory = new File(homeDirectory, "bin");
 	@ShowInKishanView
+	public static final File peersDirectory = new File(homeDirectory, "peers");
+	@ShowInKishanView
 	public static final String homepage = "https://webusers.i3s.unice.fr/~hogie/software/byransha/";
 	public static final String downloads = homepage + "/downloads/";
 	public static final String downloadBinaries = downloads + "bin/";
