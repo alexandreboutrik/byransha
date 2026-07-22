@@ -34,6 +34,6 @@ final class Update extends ProcedureAction<Byransha> {
 	@Override
 	public boolean applies() {
 		// only applies if the program is running from a jar file
-		return System.getProperty("java.classpath").split(System.getProperty("path.separator")).length == 1;
+		return System.getProperty("java.class.path").split(System.getProperty("path.separator")).length == 1;
 	}
 }

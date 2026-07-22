@@ -43,8 +43,8 @@ public class NetworkAgent extends BNode {
 	String peerName;
 	private int nbMessagesReceived;
 	private int packetSent;
-	private PublicKey publicKey;
-	private PrivateKey privateKey;
+	public PublicKey publicKey;
+	public PrivateKey privateKey;
 	IPDriver tcpDriver;
 	final Serializer serializer = new JavaSerializer<>();
 
@@ -52,8 +52,8 @@ public class NetworkAgent extends BNode {
 			throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 		super(g);
 		this.tcpDriver = new TCPDriver(this, tcpPort);
-		File publicKeyFile = new File(securityDir, "public_key.ser");
-		File privateKeyFile = new File(securityDir, "private_key.ser");
+		File publicKeyFile = new File(securityDir, "public_key.pem");
+		File privateKeyFile = new File(securityDir, "private_key.pem");
 
 		if (publicKeyFile.exists() && privateKeyFile.exists()) {
 			this.publicKey = (PublicKey) RSA.fromPem(Files.readString(publicKeyFile.toPath()));
