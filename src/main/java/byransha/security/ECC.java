@@ -1,6 +1,7 @@
 package byransha.security;
 
 import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -8,6 +9,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.SignatureException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 
 import javax.crypto.KeyAgreement;
 
@@ -79,6 +82,22 @@ public class ECC {
 			return keyAgreement.generateSecret();
 		} catch (NoSuchAlgorithmException | InvalidKeyException err) {
 			throw new SecurityException("Failed to derive X25519 shared secret", err);
+		}
+	}
+
+	/**
+	 * Imports an ECC PublicKey from an offline-exchanged PEM string.
+	 */
+	public static PublicKey fromPem(String pem, String algorithm) {
+		try {
+			String base64 = pem.replaceAll("-----(BEGIN|END) PUBLIC KEY-----", "").replaceAll("\\s", "");
+			byte[] decoded = Base64.getDecoder().decode(base64);
+
+			X509EncodedKeySpec spec = new X509EncodedKeySpec(decoded);
+			KeyFactory kf = KeyFactory.getInstance(algorithm);
+			return kf.generatePublic(spec);
+		} catch (Exception err) {
+			throw new SecurityException("Failed to parse ECC public key from PEM", err);
 		}
 	}
 }

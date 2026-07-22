@@ -3,11 +3,13 @@ package byransha.security;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.security.Key;
+import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
 import java.security.SecureRandom;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
@@ -57,6 +59,22 @@ public class RSA {
 			return cipher.doFinal(cipherData);
 		} catch (Exception err) {
 			throw new SecurityException("RSA Decryption failed", err);
+		}
+	}
+
+	/**
+	 * Imports a PublicKey from an offline-exchanged PEM string.
+	 */
+	public static PublicKey fromPem(String pem) {
+		try {
+			String base64 = pem.replaceAll("-----(BEGIN|END) PUBLIC KEY-----", "").replaceAll("\\s", "");
+			byte[] decoded = Base64.getDecoder().decode(base64);
+
+			X509EncodedKeySpec spec = new X509EncodedKeySpec(decoded);
+			KeyFactory kf = KeyFactory.getInstance(ALGORITHM);
+			return kf.generatePublic(spec);
+		} catch (Exception err) {
+			throw new SecurityException("Failed to parse RSA public key from PEM", err);
 		}
 	}
 

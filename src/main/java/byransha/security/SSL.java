@@ -1,8 +1,12 @@
 package byransha.security;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.KeyManagerFactory;
@@ -44,12 +48,19 @@ public class SSL {
 	private final SSLContext sslContext;
 
 	/**
-	 * Initializes the secure mTLS context - one peer.
+	 * Initializes the secure mTLS context for the cluster.
+	 *
+	 * @param myKey
+	 *                      The local node's private key.
+	 * @param myCert
+	 *                      The local node's public certificate.
+	 * @param peerCerts
+	 *                      Array of trusted peer certificates in the cluster.
 	 */
-	public SSL(PrivateKey myKey, X509Certificate myCert, X509Certificate peerCert) {
+	public SSL(PrivateKey myKey, X509Certificate myCert, X509Certificate[] peerCerts) {
 		try {
 			KeyManagerFactory kmf = initKeyManager(myKey, myCert);
-			TrustManagerFactory tmf = initTrustManager(peerCert);
+			TrustManagerFactory tmf = initTrustManager(peerCerts);
 
 			this.sslContext = SSLContext.getInstance(TLS_VERSION);
 			this.sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new SecureRandom());
@@ -73,31 +84,35 @@ public class SSL {
 	}
 
 	/**
-	 * Creates and initializes the TrustManager to pin the
-	 * peer's certificate.
+	 * Creates and initializes the TrustManager to pin the entire
+	 * cluster's certificates.
 	 */
-	private TrustManagerFactory initTrustManager(X509Certificate peerCert) throws Exception {
+	private TrustManagerFactory initTrustManager(X509Certificate[] peerCerts) throws Exception {
 		KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 		trustStore.load(null, null);
-		trustStore.setCertificateEntry("trusted-peer", peerCert);
+
+		for (int i = 0; i < peerCerts.length; i++) {
+			trustStore.setCertificateEntry("trusted-peer-" + i, peerCerts[i]);
+		}
 
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		tmf.init(trustStore);
 		return tmf;
 	}
 
+	/**
+	 * Listens for incoming mTLS connections from trusted peers.
+	 */
 	public SSLSocket listen(int port) {
-		try (SSLServerSocket server = (SSLServerSocket) sslContext.getServerSocketFactory().createServerSocket(port)) {
-			// Force mTLS: Reject any connection missing a valid
-			// client certificate
-			server.setNeedClientAuth(true);
+		try {
+			SSLServerSocket server = (SSLServerSocket) sslContext.getServerSocketFactory().createServerSocket(port);
+			server.setNeedClientAuth(true); // Force mTLS
 
 			SSLSocket socket = (SSLSocket) server.accept();
 			socket.startHandshake();
-
 			return socket;
 		} catch (Exception err) {
-			throw new SecurityException("Failed to listen for mTLS connection", err);
+			throw new SecurityException("Failed to listen for mTLS connection on port " + port, err);
 		}
 	}
 
@@ -105,10 +120,26 @@ public class SSL {
 		try {
 			SSLSocket socket = (SSLSocket) sslContext.getSocketFactory().createSocket(host, port);
 			socket.startHandshake();
-
 			return socket;
 		} catch (Exception err) {
 			throw new SecurityException("Failed to connect to mTLS peer", err);
+		}
+	}
+
+	/**
+	 * Utility to import an offline-exchanged X.509 Certificate from
+	 * a PEM string.
+	 *
+	 * @param pem
+	 *                The PEM formatted certificate string.
+	 * @return The parsed X509Certificate.
+	 */
+	public static X509Certificate certFromPem(String pem) {
+		try (InputStream is = new ByteArrayInputStream(pem.getBytes(StandardCharsets.UTF_8))) {
+			CertificateFactory fact = CertificateFactory.getInstance("X.509");
+			return (X509Certificate) fact.generateCertificate(is);
+		} catch (Exception err) {
+			throw new SecurityException("Failed to parse PEM certificate", err);
 		}
 	}
 }
