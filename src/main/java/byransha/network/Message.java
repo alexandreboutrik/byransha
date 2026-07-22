@@ -5,6 +5,6 @@ import java.util.List;
 
 public class Message {
 	public List<String> route = new ArrayList<>();
-	byte[] data; // encrypted and zipped
 	public long targetNodeId;
+	public Object content;
 }

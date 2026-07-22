@@ -20,7 +20,6 @@ import byransha.graph.list.action.ListNode;
 import byransha.nodes.primitive.StringNode;
 import byransha.nodes.system.Byransha;
 import byransha.security.RSA;
-import byransha.util.GZip;
 import toools.io.ser.JavaSerializer;
 import toools.io.ser.Serializer;
 
@@ -129,15 +128,9 @@ public class NetworkAgent extends BNode {
 
 		var from = findPeer(msg.route.getLast());
 
-		if (from.publicKey != null) {
-			msg.data = RSA.decrypt(msg.data, keyPair.getPrivate());
-		}
-
-		var received = serializer.fromBytes(msg.data);
-
-		if (received instanceof Ack ack) {
+		if (msg.content instanceof Ack ack) {
 			g().eventList.findEvent(ack.id).markReceivedBy(from);
-		} else if (received instanceof Event e) {
+		} else if (msg.content instanceof Event e) {
 			var alreadyKnownEvent = g().eventList.findEvent(e.id());
 
 			if (alreadyKnownEvent != null) {
@@ -152,7 +145,7 @@ public class NetworkAgent extends BNode {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-		} else if (received instanceof PeerTelemetry t) {
+		} else if (msg.content instanceof PeerTelemetry t) {
 			if (from != null) {
 				from.TokensPerSecond = t.tokensPerSecond;
 				from.IsComputing = t.isComputing;
@@ -162,7 +155,7 @@ public class NetworkAgent extends BNode {
 					from.alpha = t.alpha;
 			}
 		} else {
-			throw new IllegalStateException("received " + received.getClass());
+			throw new IllegalStateException("received " + msg.content.getClass());
 		}
 	}
 
@@ -199,10 +192,7 @@ public class NetworkAgent extends BNode {
 	public synchronized void send(Object o, PeerNode to) throws IOException {
 		var msg = new Message();
 		msg.route.add(peerName);
-		msg.data = serializer.toBytes(o);
-		msg.data = RSA.encrypt(msg.data, to.publicKey);
-		var msgBytes = GZip.gzip(serializer.toBytes(msg));
-		tcpDriver.send(msgBytes, to);
+		tcpDriver.send(serializer.toBytes(msg), to);
 		++packetSent;
 		updateInOutInfo();
 	}
@@ -225,9 +215,5 @@ public class NetworkAgent extends BNode {
 	@Override
 	public String toString() {
 		return "received: " + nbMessagesReceived + ", sent: " + packetSent;
-	}
-
-	public java.security.PublicKey getPublicKey() {
-		return this.keyPair != null ? this.keyPair.getPublic() : null;
 	}
 }
