@@ -110,4 +110,8 @@ public class PeerNode extends BNode {
 			e.printStackTrace();
 		}
 	}
+
+	public boolean isConnected() {
+		return out != null;
+	}
 }

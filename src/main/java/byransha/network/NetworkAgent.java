@@ -6,8 +6,9 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.file.Files;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 
 import byransha.event.Event;
@@ -26,6 +27,9 @@ import toools.io.ser.Serializer;
 public class NetworkAgent extends BNode {
 	public static final int port = 9876;
 	@ShowInKishanView
+	public static final File peersDirectory = new File(Byransha.homeDirectory, "peers");
+
+	@ShowInKishanView
 	File securityDir = new File(Byransha.homeDirectory, "security");
 	@ShowInKishanView
 	File authorizedKeys = new File(securityDir, "authorized_keys");
@@ -40,31 +44,40 @@ public class NetworkAgent extends BNode {
 	String peerName;
 	private int nbMessagesReceived;
 	private int packetSent;
-	private KeyPair keyPair;
+	private PublicKey publicKey;
+	private PrivateKey privateKey;
 	IPDriver tcpDriver;
 	final Serializer serializer = new JavaSerializer<>();
 
-	public NetworkAgent(BGraph g, int tcpPort) throws FileNotFoundException, IOException {
+	public NetworkAgent(BGraph g, int tcpPort)
+			throws FileNotFoundException, IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 		super(g);
 		this.tcpDriver = new TCPDriver(this, tcpPort);
-		File keyPairFile = new File(securityDir, "keyPair.ser");
+		File publicKeyFile = new File(securityDir, "public_key.ser");
+		File privateKeyFile = new File(securityDir, "private_key.ser");
 
-		if (keyPairFile.exists()) {
-			this.keyPair = (KeyPair) serializer.fromBytes(Files.readAllBytes(keyPairFile.toPath()));
+		if (publicKeyFile.exists() && privateKeyFile.exists()) {
+			this.publicKey = (PublicKey) RSA.fromPem(Files.readString(publicKeyFile.toPath()));
+			this.privateKey = (PrivateKey) RSA.fromPem(Files.readString(privateKeyFile.toPath()));
 		} else {
 			System.out.println("Generating new random RSA keys");
-			keyPair = RSA.randomKeyPair();
-			keyPairFile.getParentFile().mkdirs();
-			Files.write(keyPairFile.toPath(), serializer.toBytes(keyPair));
+			var keyPair = RSA.randomKeyPair();
+			this.publicKey = keyPair.getPublic();
+			this.privateKey = keyPair.getPrivate();
+			publicKeyFile.getParentFile().mkdirs();
+			Files.writeString(publicKeyFile.toPath(), RSA.toPem(publicKey));
+			Files.writeString(privateKeyFile.toPath(), RSA.toPem(privateKey));
 			var pub = new String(RSA.toBase64(keyPair.getPublic()));
 			System.out.println("public key: " + pub);
 			publicKeyInfo.set(pub);
 		}
 
 		new Thread(() -> {
+			peersDirectory.mkdirs();
+
 			while (true) {
 				try {
-					for (File peerDirectory : Byransha.peersDirectory.listFiles()) {
+					for (File peerDirectory : peersDirectory.listFiles()) {
 						if (peerDirectory.isDirectory()) {
 							var peer = findPeer(peerDirectory.getName());
 
@@ -90,7 +103,7 @@ public class NetworkAgent extends BNode {
 			while (true) {
 				try {
 					for (var p : peers.elements) {
-						if (p.out == null) {
+						if (!p.isConnected() && p.address != null) { // if not connexion
 							try {
 								p.setSocket(new Socket(p.address, p.port));
 							} catch (IOException e) {

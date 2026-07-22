@@ -134,7 +134,7 @@ public class SSL {
 	 *                The PEM formatted certificate string.
 	 * @return The parsed X509Certificate.
 	 */
-	public static X509Certificate certFromPem(String pem) {
+	public static X509Certificate certFromCertificatePEM(String pem) {
 		try (InputStream is = new ByteArrayInputStream(pem.getBytes(StandardCharsets.UTF_8))) {
 			CertificateFactory fact = CertificateFactory.getInstance("X.509");
 			return (X509Certificate) fact.generateCertificate(is);
