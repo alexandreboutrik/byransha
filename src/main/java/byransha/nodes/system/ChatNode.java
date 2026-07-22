@@ -1,6 +1,7 @@
 package byransha.nodes.system;
 
 import java.util.Objects;
+import javax.swing.JOptionPane;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -19,6 +20,7 @@ public class ChatNode extends BNode {
 	@ShowInKishanView
 	public ListNode<BNode> nodes = new ListNode<>(this, "history", BNode.class);
 	final User user;
+	Boolean AlerteIA = false;
 
 	public ChatNode(User user) {
 		super(user);
@@ -32,6 +34,14 @@ public class ChatNode extends BNode {
 
 	public void append(BNode n) {
 		Objects.requireNonNull(n, "cannot append null node to chat");
+		System.out.println("appending " + n + " to chat " + this);
+		if ("ask AI".equals(n.toString())) {
+			if (AlerteIA == false) {
+				afficherAlerteOllama();
+				// afficherPublicKey();
+			}
+			AlerteIA = true;
+		}
 
 		if (!nodes.elements.isEmpty() && n == nodes.elements.getLast()) // if same node
 			return;
@@ -46,14 +56,22 @@ public class ChatNode extends BNode {
 					append(fa.result);
 				}
 			} else {
-				System.out.println("parmeters: " + action.parameters());
 				nodes.elements.add(action);
 				action.chat = this;
 			}
-		} else {
+		} 
+		else {
 			nodes.elements.add(n);
 		}
 	}
+	private void afficherAlerteOllama() {
+        JOptionPane.showMessageDialog(
+            null, 
+           "L'utilisation de l'IA sans serveur distant requiert l'installation d'Ollama ainsi que du modèle sur votre machine locale.", 
+            "Configuration requise", 
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }	
 
 	@Override
 	public void createActions() {
