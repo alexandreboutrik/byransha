@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.Attributes;
@@ -14,6 +15,8 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import byransha.Main;
 import byransha.graph.Action;
@@ -48,22 +51,27 @@ public class Deploy extends Action<Byransha> {
 
 	@Override
 	protected void impl() throws Throwable {
+		File outputJar = File.createTempFile(getClass().getName(), ".jar");
+
 		var versionFile = File.createTempFile(getClass().getName(), ".txt");
-		Files.write(versionFile.toPath(), version.toString().getBytes());
-		scp(versionFile, scpHost.get(), scpRemoteDir.get() + "/last-version.txt", username.get(), null);
+		var n = new ObjectNode(factory);
+		n.put("version", version.get());
+		n.put("date", LocalDateTime.now().toString());
+		n.put("java.version", System.getProperty("java.specification.version"));
+		Files.writeString(versionFile.toPath(), n.toPrettyString());
+		scp(versionFile, scpHost.get(), scpRemoteDir.get() + "/info.json", username.get(), null);
 
 		var installFile = File.createTempFile(getClass().getName(), "ps1");
 		Files.write(installFile.toPath(), getClass().getResourceAsStream("run.ps1").readAllBytes());
 		scp(installFile, scpHost.get(), scpRemoteDir.get() + "/run.ps1", username.get(), null);
 
-		File outputJar = File.createTempFile(getClass().getName(), ".jar");
 		JarFlattener.flattenClasspathToJar(outputJar);
 		scp(outputJar, scpHost.get(), scpRemoteDir.get() + "/byransha.jar", username.get(), null);
 	}
 
 	private void scp(File f, String host, String remoteDir, String username, String password) throws IOException {
-			MinaScpUploader.uploadWithPrivateKey(host, 22, username, System.getProperty("user.home") + "/.ssh/id_rsa",
-					null, f.getAbsolutePath(), remoteDir);
+		MinaScpUploader.uploadWithPrivateKey(host, 22, username, System.getProperty("user.home") + "/.ssh/id_rsa", null,
+				f.getAbsolutePath(), remoteDir);
 	}
 
 	public class JarFlattener {
@@ -71,8 +79,9 @@ public class Deploy extends Action<Byransha> {
 		/**
 		 * Flattens the current system classpath into a single large uber-jar. * @param
 		 * outputJar The destination path for the consolidated fat jar.
-		 * 
-		 * @throws IOException If file reading or writing fails.
+		 *
+		 * @throws IOException
+		 *                         If file reading or writing fails.
 		 */
 		public static void flattenClasspathToJar(File outputJar) throws IOException {
 			// 1. Get the current classpath string split by the OS path separator

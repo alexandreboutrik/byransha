@@ -17,17 +17,27 @@ public class MinaScpUploader {
 	/**
 	 * Uploads a file via SCP using Private Key Authentication.
 	 *
-	 * @param host           Remote hostname or IP.
-	 * @param port           SSH Port (usually 22).
-	 * @param username       SSH Username.
-	 * @param privateKeyPath Path to your local private key file (e.g.,
-	 *                       ~/.ssh/id_rsa).
-	 * @param passphrase     Optional password if the private key is encrypted (pass
-	 *                       null if unencrypted).
-	 * @param localPath      Path to local file to upload.
-	 * @param remotePath     Destination directory or file path on the remote
-	 *                       server.
-	 * @throws IOException If connection, authentication, or file transfer fails.
+	 * @param host
+	 *                           Remote hostname or IP.
+	 * @param port
+	 *                           SSH Port (usually 22).
+	 * @param username
+	 *                           SSH Username.
+	 * @param privateKeyPath
+	 *                           Path to your local private key file (e.g.,
+	 *                           ~/.ssh/id_rsa).
+	 * @param passphrase
+	 *                           Optional password if the private key is encrypted
+	 *                           (pass
+	 *                           null if unencrypted).
+	 * @param localPath
+	 *                           Path to local file to upload.
+	 * @param remotePath
+	 *                           Destination directory or file path on the remote
+	 *                           server.
+	 * @throws IOException
+	 *                         If connection, authentication, or file transfer
+	 *                         fails.
 	 */
 	public static void uploadWithPrivateKey(String host, int port, String username, String privateKeyPath,
 			String passphrase, String localPath, String remotePath) throws IOException {
@@ -59,7 +69,8 @@ public class MinaScpUploader {
 				// If the key file is encrypted with a password passphrase, configure a password
 				// provider
 				if (passphrase != null && !passphrase.isEmpty()) {
-					keyPairProvider.setPasswordFinder((s, resourceKey, retryIndex) -> passphrase);				}
+					keyPairProvider.setPasswordFinder((s, resourceKey, retryIndex) -> passphrase);
+				}
 
 				// Extract key pairs from file and add them to the active session identities
 				Iterable<KeyPair> keys = keyPairProvider.loadKeys(session);

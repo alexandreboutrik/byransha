@@ -11,7 +11,7 @@ import byransha.nodes.primitive.TextNode;
 public final class Export extends FunctionAction<BNode, ListNode<TextNode>> {
 	public Export(BNode node) {
 		super(node, node.class);
-		hasButtonOnKishanView=true;
+		hasButtonOnKishanView = true;
 	}
 
 	@Override
@@ -29,15 +29,14 @@ public final class Export extends FunctionAction<BNode, ListNode<TextNode>> {
 		result = new ListNode<TextNode>(this, "export texts", TextNode.class);
 		var csvs = new ArrayList<CSVData>();
 		inputNode.toCSVStreams(csvs, true);
-		csvs.stream().map(csv -> new byransha.nodes.primitive.TextNode(null, csv.name + " (CSV)", csv.data))
+		csvs.stream().map(csv -> new byransha.nodes.primitive.TextNode(this, csv.name + " as CSV", csv.data))
 				.forEach(n -> result.get().add(n));
-		result.elements
-				.add(new byransha.nodes.primitive.TextNode(null, id() + " (JSON)", describeAsJSON().toPrettyString()));
+		result.elements.add(new byransha.nodes.primitive.TextNode(this, "JSON", describeAsJSON().toPrettyString()));
 	}
 
 	@Override
 	public boolean applies() {
 		return true;
-//		return inputNode instanceof BusinessNode;
+		// return inputNode instanceof BusinessNode;
 	}
 }

@@ -34,6 +34,7 @@ public class JVMNode extends SystemNode {
 	public String home() {
 		return System.getProperty("java.home");
 	}
+
 	@ShowInKishanView
 	public String vendor() {
 		return System.getProperty("java.vm.vendor");
@@ -43,7 +44,7 @@ public class JVMNode extends SystemNode {
 	public String name() {
 		return System.getProperty("java.vm.name");
 	}
-	
+
 	@ShowInKishanView
 	public String classVersion() {
 		return System.getProperty("java.class.version");
@@ -70,13 +71,12 @@ public class JVMNode extends SystemNode {
 		var r = new ListNode<StringNode>(this, "props", StringNode.class);
 
 		for (var e : System.getProperties().entrySet()) {
-			r.elements.add(new StringNode(this,  e.getKey() + " = " + e.getValue(), null));
+			r.elements.add(new StringNode(this, e.getKey() + " = " + e.getValue(), null));
 		}
 
 		return r;
 	}
 
-	
 	@Override
 	public ObjectNode describeAsJSON() {
 		var r = new ObjectNode(factory);

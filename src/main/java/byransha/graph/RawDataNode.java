@@ -11,7 +11,6 @@ public class RawDataNode extends PrimitiveValueNode<byte[]> {
 		super(g);
 	}
 
-
 	@Override
 	public String whatIsThis() {
 		return "raw data";

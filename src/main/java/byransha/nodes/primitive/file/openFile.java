@@ -1,4 +1,4 @@
-package byransha.nodes.primitive;
+package byransha.nodes.primitive.file;
 
 import java.awt.Desktop;
 
@@ -12,6 +12,7 @@ public class openFile extends ProcedureAction<FileNode> {
 
 	public openFile(FileNode f) {
 		super(f, file.class);
+		hasButtonOnKishanView = true;
 	}
 
 	@Override

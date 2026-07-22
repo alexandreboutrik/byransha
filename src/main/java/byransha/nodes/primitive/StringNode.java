@@ -55,7 +55,7 @@ public class StringNode extends PrimitiveValueNode<String> {
 			set(new StringBuilder(s).reverse().toString());
 		}
 	}
-	
+
 	@Override
 	public String whatIsThis() {
 		return "a sequence of characters";
@@ -113,11 +113,10 @@ public class StringNode extends PrimitiveValueNode<String> {
 
 		tf.setColumns(20);
 		tf.setEditable(!readOnly);
-		
-		if(readOnly) {
+
+		if (readOnly) {
 			tf.setBorder(null);
-		}
-		else {
+		} else {
 			tf.setBorder(new LineBorder(Color.lightGray));
 		}
 		ValueChangeListener<String> changeListener = (n, old, newValue) -> SwingUtilities

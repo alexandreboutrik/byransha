@@ -45,11 +45,11 @@ public class ChatSheet extends Sheet {
 				is.appendToCurrentLine(">");
 			}
 		}
-		
+
 		is.currentLine.setBackground(chat.g().swing.getBackgroundColor());
 		is.currentLine.setOpaque(true);
 
-//		appendToCurrentLine(n + " (" + n.whatIsThis() + ")");
+		// appendToCurrentLine(n + " (" + n.whatIsThis() + ")");
 		is.newLine();
 		is.newLine();
 		n.writeKishanView(is);

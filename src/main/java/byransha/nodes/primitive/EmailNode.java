@@ -12,7 +12,7 @@ public class EmailNode extends StringNode {
 	public EmailNode(Person g, String s) {
 		super(g, s, re);
 	}
-	
+
 	public Person owner() {
 		return (Person) parent;
 	}

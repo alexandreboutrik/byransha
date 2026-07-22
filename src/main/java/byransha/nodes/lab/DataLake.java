@@ -13,10 +13,11 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import byransha.graph.ActionMethod;
 import byransha.graph.BGraph;
 import byransha.graph.BNode;
 import byransha.graph.ShowInKishanView;
-import byransha.nodes.primitive.FileNode;
+import byransha.nodes.primitive.file.FileNode;
 import byransha.util.Cout;
 
 public class DataLake extends BNode {
@@ -90,6 +91,7 @@ public class DataLake extends BNode {
 		return "datalake at " + dir.file.getAbsolutePath();
 	}
 
+	@ActionMethod
 	public void load(Lab i3s) throws IOException {
 		if (dir == null)
 			throw new NullPointerException();
@@ -121,10 +123,10 @@ public class DataLake extends BNode {
 		i3s.tutelles.elements.add(UniCA);
 
 		for (var n : List.of("COMRED", "SIS", "MDSC", "SPARKS")) {
-			var group = new ResearchGroup(i3s, n); 
+			var group = new ResearchGroup(i3s, n);
 			i3s.subStructures.elements.add(group);
 		}
-		
+
 		var adminGroup = new Structure(i3s);
 		adminGroup.name.set("SG/Administration");
 		i3s.subStructures.elements.add(adminGroup);
@@ -136,7 +138,6 @@ public class DataLake extends BNode {
 		var ds4h = new EUR(i3s);
 		ds4h.name.set("DS4H");
 		i3s.subStructures.elements.add(ds4h);
-
 
 		for (var n : List.of("ALGORITHMES", "Inria", "IUT Sophia", "Polytech", "Lucioles", "Valrose", "Fabron")) {
 			var campus = new Campus(UniCA); // new Campus(graph);

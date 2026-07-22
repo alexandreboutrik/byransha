@@ -11,7 +11,6 @@ import byransha.graph.BGraph;
 
 public class SerQueueSerializer implements EventQueueSerializer {
 
-
 	@Override
 	public String ext() {
 		return "ser";
@@ -29,5 +28,6 @@ public class SerQueueSerializer implements EventQueueSerializer {
 		var is = new ObjectInputStream(new FileInputStream(in));
 		var q = (InMemoryEventList) is.readObject();
 		is.close();
-		return q;	}
+		return q;
+	}
 }

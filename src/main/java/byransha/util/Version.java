@@ -21,7 +21,7 @@ under the License.
 
 /* Contributors:
 
-Luc Hogie (CNRS, I3S laboratory, University of Nice-Sophia Antipolis) 
+Luc Hogie (CNRS, I3S laboratory, University of Nice-Sophia Antipolis)
 Aurelien Lancin (Coati research team, Inria)
 Christian Glacet (LaBRi, Bordeaux)
 David Coudert (Coati research team, Inria)
@@ -31,8 +31,8 @@ Issam Tahiri (Coati research team, Inria)
 Julien Fighiera (Aoste research team, Inria)
 Laurent Viennot (Gang research-team, Inria)
 Michel Syska (I3S, Université Cote D'Azur)
-Nathann Cohen (LRI, Saclay) 
-Julien Deantoin (I3S, Université Cote D'Azur, Saclay) 
+Nathann Cohen (LRI, Saclay)
+Julien Deantoin (I3S, Université Cote D'Azur, Saclay)
 
 */
 
@@ -41,9 +41,7 @@ package byransha.util;
 import java.util.Arrays;
 
 public class Version implements Comparable<Version> {
-	private int[] numbers = new int[] {0, 0, 1};
-
-
+	private int[] numbers = new int[] { 0, 0, 1 };
 
 	public void set(String s) {
 		String[] a = s.split("\\.");
@@ -52,8 +50,7 @@ public class Version implements Comparable<Version> {
 			for (int i = 0; i < 3; ++i) {
 				numbers[i] = Integer.parseInt(a[i]);
 			}
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("invalid version: " + s);
 		}
 	}
@@ -114,13 +111,12 @@ public class Version implements Comparable<Version> {
 		return Arrays.hashCode(numbers);
 	}
 
-
 	public boolean isNewerThan(Version v) {
 		return compareTo(v) > 0;
 	}
 
 	public int compareTo(Version v) {
-		if ( ! compliesWith(v))
+		if (!compliesWith(v))
 			throw new IllegalArgumentException(
 					"version do not comply: " + this + " and " + v);
 

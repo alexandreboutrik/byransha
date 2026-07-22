@@ -215,7 +215,7 @@ public class ListNode<T extends BNode> extends BNode {
 			line.add(new ListItemPanel(elements.get(i), this, i + 1, sheet.chat));
 		}
 
-//		sheet.newLine();
+		// sheet.newLine();
 		elements.addListener(new ListenableList.Listener<T>() {
 
 			@Override

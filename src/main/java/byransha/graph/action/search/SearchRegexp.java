@@ -6,7 +6,7 @@ import byransha.nodes.primitive.StringNode;
 public class SearchRegexp extends Search {
 	public StringNode regexp;
 
-	public SearchRegexp( BNode srcNode) {
+	public SearchRegexp(BNode srcNode) {
 		super(srcNode);
 		regexp = new StringNode(this, ".*", ".+");
 	}

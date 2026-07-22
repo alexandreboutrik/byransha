@@ -1,18 +1,14 @@
 package byransha.network;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.nio.file.Files;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.Properties;
 
 import byransha.event.Event;
 import byransha.graph.Ack;
@@ -42,43 +38,19 @@ public class NetworkAgent extends BNode {
 	public final ListNode<PeerNode> peers = new ListNode<>(this, "peers", PeerNode.class);
 	@ShowInKishanView
 	String peerName;
-	private int packetReceived;
+	private int nbMessagesReceived;
 	private int packetSent;
 	private KeyPair keyPair;
-	IPDriver tcpDriver = new TCPDriver(this);
+	IPDriver tcpDriver;
 	final Serializer serializer = new JavaSerializer<>();
 
-	public NetworkAgent(BGraph g) throws FileNotFoundException, IOException {
+	public NetworkAgent(BGraph g, int tcpPort) throws FileNotFoundException, IOException {
 		super(g);
-
-		if (authorizedKeys.exists()) {
-			var props = new Properties();
-			props.load(new FileInputStream(authorizedKeys));
-
-			for (var e : props.entrySet()) {
-				var name = (String) e.getKey();
-				var base64key = (String) e.getValue();
-				byte[] der = Base64.getDecoder().decode(base64key);
-				X509EncodedKeySpec spec = new X509EncodedKeySpec(der);
-				try {
-					var pk = KeyFactory.getInstance("RSA").generatePublic(spec);
-					var p = new PeerNode(g);
-					p.name = name;
-					p.publicKey = pk;
-					peers.elements.add(p);
-				} catch (InvalidKeySpecException | NoSuchAlgorithmException err) {
-					g().errorLog.add(err);
-				}
-			}
-		} else {
-			authorizedKeys.getParentFile().mkdirs();
-			Files.write(authorizedKeys.toPath(), "".getBytes());
-		}
-
+		this.tcpDriver = new TCPDriver(this, tcpPort);
 		File keyPairFile = new File(securityDir, "keyPair.ser");
 
 		if (keyPairFile.exists()) {
-			keyPair = (KeyPair) serializer.fromBytes(Files.readAllBytes(keyPairFile.toPath()));
+			this.keyPair = (KeyPair) serializer.fromBytes(Files.readAllBytes(keyPairFile.toPath()));
 		} else {
 			System.out.println("Generating new random RSA keys");
 			keyPair = RSA.randomKeyPair();
@@ -89,11 +61,57 @@ public class NetworkAgent extends BNode {
 			publicKeyInfo.set(pub);
 		}
 
+		new Thread(() -> {
+			while (true) {
+				try {
+					for (File peerDirectory : Byransha.peersDirectory.listFiles()) {
+						if (peerDirectory.isDirectory()) {
+							var peer = findPeer(peerDirectory.getName());
+
+							if (peer == null) {
+								try {
+									peer = new PeerNode(g, peerDirectory);
+									peers.elements.add(peer);
+								} catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+					}
+
+					Thread.sleep(990);
+				} catch (InterruptedException e) {
+					g().errorLog.add(e);
+				}
+			}
+		}, "discover peers info on disk").start();
+
+		new Thread(() -> {
+			while (true) {
+				try {
+					for (var p : peers.elements) {
+						if (p.out == null) {
+							try {
+								p.setSocket(new Socket(p.address, p.port));
+							} catch (IOException e) {
+								p.disconnect();
+								g().errorLog.add(e);
+							}
+						}
+					}
+
+					Thread.sleep(1012);
+				} catch (InterruptedException e) {
+					g().errorLog.add(e);
+				}
+			}
+		}, "connect to peers").start();
+
 	}
 
 	@Override
-	protected void handle(Message msg)  {
-		++packetReceived;
+	protected synchronized void handle(Message msg) {
+		++nbMessagesReceived;
 		updateInOutInfo();
 
 		var from = findPeer(msg.route.getLast());
@@ -125,9 +143,10 @@ public class NetworkAgent extends BNode {
 			if (from != null) {
 				from.TokensPerSecond = t.tokensPerSecond;
 				from.IsComputing = t.isComputing;
-                from.promptLag = t.promptLag;
-                from.queueSize = t.queueSize;
-                if (t.alpha > 0) from.alpha = t.alpha;
+				from.promptLag = t.promptLag;
+				from.queueSize = t.queueSize;
+				if (t.alpha > 0)
+					from.alpha = t.alpha;
 			}
 		} else {
 			throw new IllegalStateException("received " + received.getClass());
@@ -176,7 +195,7 @@ public class NetworkAgent extends BNode {
 	}
 
 	private void updateInOutInfo() {
-		inOutInfo.set(packetReceived + " received, " + packetSent + " sent");
+		inOutInfo.set(nbMessagesReceived + " received, " + packetSent + " sent");
 	}
 
 	public synchronized void send(Object o) throws IOException {
@@ -192,10 +211,10 @@ public class NetworkAgent extends BNode {
 
 	@Override
 	public String toString() {
-		return "received: " + packetReceived + ", sent: " + packetSent;
+		return "received: " + nbMessagesReceived + ", sent: " + packetSent;
 	}
-	
+
 	public java.security.PublicKey getPublicKey() {
-    	return this.keyPair != null ? this.keyPair.getPublic() : null;
-}
+		return this.keyPair != null ? this.keyPair.getPublic() : null;
+	}
 }

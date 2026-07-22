@@ -46,29 +46,29 @@ import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 
-
-
 public class QueryIA extends FunctionAction<BNode, BNode> {
 	private static final ObjectMapper mapper = new ObjectMapper();
 	private static final ConcurrentHashMap<String, OllamaStreamingChatModel> MODEL_CACHE = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, ToolEnabledAssistant> ASSISTANT_CACHE = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, ToolEnabledAssistant> ASSISTANT_CACHE = new ConcurrentHashMap<>();
 	private static final InMemoryChatMemoryStore MEMORY_STORE = new InMemoryChatMemoryStore();
     private static final int MAX_MESSAGES = 8;
 
 	public enum ResponseMode {
 		JSON_ONLY, CONVERSATION
 	}
-	
+
 	public enum Temerature {
-		LOW,MEDIUM
+		LOW, MEDIUM
 	}
 
 	@ShowInKishanView
 	public final StringNode prompt = new StringNode(this, "", ".+");
-	public final JSONNode inputJSON ;
+	public final JSONNode inputJSON;
 	@ShowInKishanView
-	public final TextNode info = new TextNode(this, "La question est envoyé a l'IA, elle peut se tromper, verifier les réponses","La question est envoyé a l'IA, elle peut se tromper, verifier les réponses");
-	
+	public final TextNode info = new TextNode(this,
+			"La question est envoyé a l'IA, elle peut se tromper, verifier les réponses",
+			"La question est envoyé a l'IA, elle peut se tromper, verifier les réponses");
+
 	@ShowInKishanView
 	public final BooleanNode conversation = new BooleanNode(this, false);
 	
@@ -76,13 +76,12 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 	private static final String SERVER_MODEL = "ornith:9b";
 	private volatile ResponseMode responseMode = ResponseMode.CONVERSATION;
 	private static volatile double myCurrentSpeed = 10.0;
-    private static volatile double myAlpha = -1.0;
-    private static volatile double myPromptLagMs = 1500.0;
+	private static volatile double myAlpha = -1.0;
+	private static volatile double myPromptLagMs = 1500.0;
 	private static volatile boolean ollamaVerified = false;
-	private boolean ActivateListNodeResponse = false; 
+	private boolean ActivateListNodeResponse = false;
 	private volatile ChatNode currentChat;
 
-    
 	@ShowInKishanView
 	private final ListNode<AiNode> ShowPeersInfo = getAiNodes();
 	
@@ -100,46 +99,42 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 		return null;
 	}
 
-				 
-    public static double calculerAlphaAutomatique(long totalParameters, int expertCount) {
-        double activeParameters;
-        if (expertCount > 0) {
-            activeParameters = (totalParameters / 1_000_000_000.0) * 0.4; 
-        } else {
-            activeParameters = totalParameters / 1_000_000_000.0;
-        }
-        double alpha = 1.0 + (activeParameters * 0.1);
-        return Math.clamp(alpha, 1.0, 10.0); 
-    }
+	public static double calculerAlphaAutomatique(long totalParameters, int expertCount) {
+		double activeParameters;
+		if (expertCount > 0) {
+			activeParameters = (totalParameters / 1_000_000_000.0) * 0.4;
+		} else {
+			activeParameters = totalParameters / 1_000_000_000.0;
+		}
+		double alpha = 1.0 + (activeParameters * 0.1);
+		return Math.clamp(alpha, 1.0, 10.0);
+	}
 
-
-
-    public static double recupererAlphaDepuisOllama(String ollamaUrl, String modelName) {
-        try {
-            HttpClient client = HttpClient.newHttpClient();
-            String jsonPayload = "{\"name\": \"" + modelName + "\"}";
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(ollamaUrl + "/api/show"))
-                .POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
-                .header("Content-Type", "application/json")
-                .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            JsonNode root = mapper.readTree(response.body());
-            long totalParams = root.path("model_info").path("general.parameter_count").asLong(3_000_000_000L);
-            int experts = root.path("model_info").path("general.expert_count").asInt(0);
+	public static double recupererAlphaDepuisOllama(String ollamaUrl, String modelName) {
+		try {
+			HttpClient client = HttpClient.newHttpClient();
+			String jsonPayload = "{\"name\": \"" + modelName + "\"}";
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(URI.create(ollamaUrl + "/api/show"))
+					.POST(HttpRequest.BodyPublishers.ofString(jsonPayload))
+					.header("Content-Type", "application/json")
+					.build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			JsonNode root = mapper.readTree(response.body());
+			long totalParams = root.path("model_info").path("general.parameter_count").asLong(3_000_000_000L);
+			int experts = root.path("model_info").path("general.expert_count").asInt(0);
 			System.out.println("Test Alpha: " + calculerAlphaAutomatique(totalParams, experts));
-            return calculerAlphaAutomatique(totalParams, experts);
-        } catch (Exception e) {
-            System.out.println("  Impossible de lire les specs d'Ollama, alpha par défaut = 1.0");
-            return 1.0; 
-        }
-    }
+			return calculerAlphaAutomatique(totalParams, experts);
+		} catch (Exception e) {
+			System.out.println("  Impossible de lire les specs d'Ollama, alpha par défaut = 1.0");
+			return 1.0;
+		}
+	}
 
 	interface ToolEnabledAssistant {
 		@SystemMessage("{{system}}")
 		TokenStream chat(@V("system") String systemMessage, @UserMessage String userMessage);
 	}
-	
 
 	class AI extends Category {
 	}
@@ -154,15 +149,10 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 		return "ask AI";
 	}
 
-
-
-	
 	@Override
 	public boolean applies() {
 		return true;
 	}
-
-
 
 	@Override
 	public void impl() throws Throwable {
@@ -195,7 +185,7 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 		System.out.println("Envoi de la question à l'IA : " + userQuestion);
         String iaResponse;
 		long startTime = System.currentTimeMillis();
-		int[] tokensGeneratedCount = {0}; 
+		int[] tokensGeneratedCount = { 0 };
 		try {
             com.fasterxml.jackson.databind.JsonNode focusedNodeJson = inputNode.describeAsJSON();
 			AiResult aiResult = queryIA(assistant, focusedNodeJson, userQuestion);
@@ -206,26 +196,25 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 			iaResponse = "Erreur interne lors de la génération.";
 		} finally {
 			// Recalcule notre score de vitesse et on l'annonce
-			long durationMs = System.currentTimeMillis() - (startTime + (long)myPromptLagMs);
+			long durationMs = System.currentTimeMillis() - (startTime + (long) myPromptLagMs);
 			if (durationMs > 0 && tokensGeneratedCount[0] > 0) {
 				myCurrentSpeed = (tokensGeneratedCount[0] / (double) durationMs) * 1000.0;
 				System.out.println("Test speed: " + myCurrentSpeed + " tokens/s");
 			}
 
 		}
-        
-        
-        // Traiter la réponse
-        if (iaResponse != null) {
-            if (iaResponse.contains("```json")) {
-                iaResponse = iaResponse.substring(iaResponse.indexOf("```json") + 7);
-                if (iaResponse.contains("```")) {
-                    iaResponse = iaResponse.substring(0, iaResponse.lastIndexOf("```"));
-                }
-            } else if (iaResponse.startsWith("```") && iaResponse.endsWith("```")) {
-                iaResponse = iaResponse.substring(3, iaResponse.length() - 3);
-            }
-            iaResponse = iaResponse.trim();
+
+		// Traiter la réponse
+		if (iaResponse != null) {
+			if (iaResponse.contains("```json")) {
+				iaResponse = iaResponse.substring(iaResponse.indexOf("```json") + 7);
+				if (iaResponse.contains("```")) {
+					iaResponse = iaResponse.substring(0, iaResponse.lastIndexOf("```"));
+				}
+			} else if (iaResponse.startsWith("```") && iaResponse.endsWith("```")) {
+				iaResponse = iaResponse.substring(3, iaResponse.length() - 3);
+			}
+			iaResponse = iaResponse.trim();
 			if (iaResponse.startsWith("[") && iaResponse.endsWith("]")) {
 				try {
 					JsonNode parsed = mapper.readTree(iaResponse);
@@ -239,13 +228,13 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 			}
 		}
 		try {
-        if (responseMode == ResponseMode.CONVERSATION) {
-			if (ActivateListNodeResponse) {
-				try {
-					JsonNode parsed = mapper.readTree(iaResponse);
-					var l = new ListNode<BNode>(parent, "IA numeric array", BNode.class);
-					for (JsonNode value : parsed) {
-						String idText = value.asText().trim();
+			if (responseMode == ResponseMode.CONVERSATION) {
+				if (ActivateListNodeResponse) {
+					try {
+						JsonNode parsed = mapper.readTree(iaResponse);
+						var l = new ListNode<BNode>(parent, "IA numeric array", BNode.class);
+						for (JsonNode value : parsed) {
+							String idText = value.asText().trim();
 							if (idText.isEmpty())
 								continue;
 							BNode realNode = g().indexes.byId.getByText(idText);
@@ -256,19 +245,19 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 							}
 						}
 
-					result = l;
-					return;
-				} catch (Exception e) {
-					// Ignore JSON parsing errors
+						result = l;
+						return;
+					} catch (Exception e) {
+						// Ignore JSON parsing errors
+					}
 				}
-			}
-		} else if (responseMode == ResponseMode.JSON_ONLY) {
-			if (ActivateListNodeResponse) {
-				try {
-					JsonNode parsed = mapper.readTree(iaResponse);
-					var l = new ListNode<BNode>(parent, "IA numeric array", BNode.class);
-					for (JsonNode value : parsed) {
-						String idText = value.asText().trim();
+			} else if (responseMode == ResponseMode.JSON_ONLY) {
+				if (ActivateListNodeResponse) {
+					try {
+						JsonNode parsed = mapper.readTree(iaResponse);
+						var l = new ListNode<BNode>(parent, "IA numeric array", BNode.class);
+						for (JsonNode value : parsed) {
+							String idText = value.asText().trim();
 							if (idText.isEmpty())
 								continue;
 							BNode realNode = g().indexes.byId.getByText(idText);
@@ -279,40 +268,39 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 							}
 						}
 
-					result = l;
-					return;
-				} catch (Exception e) {
-					// Ignore JSON parsing errors
+						result = l;
+						return;
+					} catch (Exception e) {
+						// Ignore JSON parsing errors
+					}
 				}
+			} else {
+				result = new TextNode(g(), "IA response", iaResponse);
+				return;
 			}
-        }
-		 else {
-            result = new TextNode(g(), "IA response", iaResponse);
-            return;
-        }
 
-		var extractedJson = AiResponseAnalyser.extractFirstJsonPayload(iaResponse);
-		var analysableResponse = extractedJson != null ? extractedJson : iaResponse;
+			var extractedJson = AiResponseAnalyser.extractFirstJsonPayload(iaResponse);
+			var analysableResponse = extractedJson != null ? extractedJson : iaResponse;
 
-		if (AiResponseAnalyser.isArrayOfNumbers(analysableResponse)) {
-			JsonNode parsed = mapper.readTree(analysableResponse);
-			var l = new ListNode<TextNode>(parent, "IA numeric array", TextNode.class);
-			for (JsonNode value : parsed) {
-				l.elements.add(new TextNode(this, "value", value.asText()));
-			}
-			result = l;
-		} else if (AiResponseAnalyser.isDistribution(analysableResponse)) {
-			var distributionNode = new DistributionNode<String>(this) {
-				@Override
-				public String toString() {
-					return "IA distribution";
+			if (AiResponseAnalyser.isArrayOfNumbers(analysableResponse)) {
+				JsonNode parsed = mapper.readTree(analysableResponse);
+				var l = new ListNode<TextNode>(parent, "IA numeric array", TextNode.class);
+				for (JsonNode value : parsed) {
+					l.elements.add(new TextNode(this, "value", value.asText()));
 				}
-			};
+				result = l;
+			} else if (AiResponseAnalyser.isDistribution(analysableResponse)) {
+				var distributionNode = new DistributionNode<String>(this) {
+					@Override
+					public String toString() {
+						return "IA distribution";
+					}
+				};
 
-			JsonNode parsed = mapper.readTree(analysableResponse);
-			for (var entry : parsed.properties()) {
-				distributionNode.entries.addOccurence(entry.getKey(), entry.getValue().asDouble());
-			}
+				JsonNode parsed = mapper.readTree(analysableResponse);
+				for (var entry : parsed.properties()) {
+					distributionNode.entries.addOccurence(entry.getKey(), entry.getValue().asDouble());
+				}
 
 				result = distributionNode;
 			} else {
@@ -348,7 +336,6 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 		this.responseMode = responseMode == null ? ResponseMode.JSON_ONLY : responseMode;
 	}
 
-
 	public ResponseMode getResponseMode() {
 		return responseMode;
 	}
@@ -358,7 +345,8 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 		var SystemPrompt = new StringBuilder();
 		SystemPrompt.append("Your personality: You are a helpful assistant specialized in exploring a data graph..\n");
 		if (mode == ResponseMode.JSON_ONLY) {
-			SystemPrompt.append("You have access to the graph tools. Before producing the output, call the necessary tools to gather evidence. After using the tools, provide STRICTLY valid JSON .\n");
+			SystemPrompt.append(
+					"You have access to the graph tools. Before producing the output, call the necessary tools to gather evidence. After using the tools, provide STRICTLY valid JSON .\n");
 		} else {
 			SystemPrompt.append("Give a conversational answer to the user \n");
 		}
@@ -414,6 +402,7 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 	public static class AiResult {
 		public String text;
 		public int tokenCount;
+
 		public AiResult(String text, int tokenCount) {
 			this.text = text;
 			this.tokenCount = tokenCount;
@@ -422,53 +411,53 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 
 	protected AiResult queryIA(ToolEnabledAssistant assistant, JsonNode inputJSON, String question)
 			throws Exception {
-            
-			if (!ollamaVerified) {
-				if (!OllamaRequire.checkRequirements()) {
-					System.out.println(" Ollama n'est pas installé impossible de faire une requête IA.");
-					return new AiResult("Erreur: Ollama n'est pas installé", 0);
+
+		if (!ollamaVerified) {
+			if (!OllamaRequire.checkRequirements()) {
+				System.out.println(" Ollama n'est pas installé impossible de faire une requête IA.");
+				return new AiResult("Erreur: Ollama n'est pas installé", 0);
 			}
 			ollamaVerified = true;
 		}
 
 		var prompts = buildLlmPrompt(inputJSON, question, responseMode, inputNode);
 
-		// Synchronous fallback wrapper since `impl()` doesn't support async streams yet.
+		// Synchronous fallback wrapper since `impl()` doesn't support async streams
+		// yet.
 		java.util.concurrent.CompletableFuture<AiResult> future = new java.util.concurrent.CompletableFuture<>();
-		
+
 		long requestStartTime = System.currentTimeMillis();
-		boolean[] isFirstToken = {true};
+		boolean[] isFirstToken = { true };
 
 		assistant.chat(prompts[0], prompts[1])
-			.onNext(token -> {
-				if (isFirstToken[0]) {
-					isFirstToken[0] = false;
-					myPromptLagMs = System.currentTimeMillis() - requestStartTime;
-					System.out.println("Test prompt lag: " + myPromptLagMs + " ms");
-				}
-				System.out.print(token);
-				System.out.flush(); // FORCE L'AFFICHAGE IMMEDIAT DU TOKEN
-			})
-			.onComplete(response -> {
-				System.out.println(); // newline after stream
-				int tokenCount = 0;
-				if (response.tokenUsage() != null && response.tokenUsage().outputTokenCount() != null) {
-					tokenCount = response.tokenUsage().outputTokenCount();
-				}
-				future.complete(new AiResult(response.content().text(), tokenCount));
-			})
-			.onError(error -> {
-				System.err.println("\n  Erreur pendant le stream IA : " + error.getMessage());
-				error.printStackTrace();
-				future.completeExceptionally(error);
-			})
-			.start();
+				.onNext(token -> {
+					if (isFirstToken[0]) {
+						isFirstToken[0] = false;
+						myPromptLagMs = System.currentTimeMillis() - requestStartTime;
+						System.out.println("Test prompt lag: " + myPromptLagMs + " ms");
+					}
+					System.out.print(token);
+					System.out.flush(); // FORCE L'AFFICHAGE IMMEDIAT DU TOKEN
+				})
+				.onComplete(response -> {
+					System.out.println(); // newline after stream
+					int tokenCount = 0;
+					if (response.tokenUsage() != null && response.tokenUsage().outputTokenCount() != null) {
+						tokenCount = response.tokenUsage().outputTokenCount();
+					}
+					future.complete(new AiResult(response.content().text(), tokenCount));
+				})
+				.onError(error -> {
+					System.err.println("\n  Erreur pendant le stream IA : " + error.getMessage());
+					error.printStackTrace();
+					future.completeExceptionally(error);
+				})
+				.start();
 
 		return future.join();
 	}
 
-
- private ToolEnabledAssistant getOrCreateAssistant() throws IOException {
+	private ToolEnabledAssistant getOrCreateAssistant() throws IOException {
 		String currentOllamaUrl = "http://localhost:11434";
 		try {
 			var aiNodes = ShowPeersInfo.get();
@@ -498,17 +487,16 @@ public class QueryIA extends FunctionAction<BNode, BNode> {
 		return ASSISTANT_CACHE.computeIfAbsent(cacheKey, key -> {
 			var model = getOrCreateModel(selectedOllamaUrl);
 			ChatMemory memory = MessageWindowChatMemory.builder()
-				.maxMessages(MAX_MESSAGES)
-				.chatMemoryStore(MEMORY_STORE)
-				.build();
-            return AiServices.builder(ToolEnabledAssistant.class)
-                    .streamingChatLanguageModel(model)
-                    .tools(new GraphTools(inputNode))
-                    .chatMemory(memory)
-                    .build();
-        });
-    }
-
+					.maxMessages(MAX_MESSAGES)
+					.chatMemoryStore(MEMORY_STORE)
+					.build();
+			return AiServices.builder(ToolEnabledAssistant.class)
+					.streamingChatLanguageModel(model)
+					.tools(new GraphTools(inputNode))
+					.chatMemory(memory)
+					.build();
+		});
+	}
 
 	private OllamaStreamingChatModel getOrCreateModel(String ollamaUrl) {
 		var cacheKey = ollamaUrl + "|" + PRIMARY_MODEL;

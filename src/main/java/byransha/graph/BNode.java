@@ -33,6 +33,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -50,10 +51,10 @@ import byransha.graph.action.search.SearchText;
 import byransha.graph.list.action.ListNode;
 import byransha.graph.relection.ClassNode;
 import byransha.network.Message;
-import byransha.nodes.primitive.FileNode;
 import byransha.nodes.primitive.LongNode;
 import byransha.nodes.primitive.StringNode;
 import byransha.nodes.primitive.ValuedNode;
+import byransha.nodes.primitive.file.FileNode;
 import byransha.nodes.system.ChatNode;
 import byransha.nodes.system.User;
 import byransha.ui.swing.ChatSheet;
@@ -72,6 +73,9 @@ import byransha.util.Stop;
 import byransha.util.TriConsumer;
 
 public abstract class BNode {
+	final public static JsonNodeFactory factory = new JsonNodeFactory(true);
+	final public static ObjectMapper objectMapper = new ObjectMapper();
+
 	public final BNode parent;
 	public boolean readOnly;
 	protected boolean resilient = false;
@@ -362,8 +366,6 @@ public abstract class BNode {
 		});
 	}
 
-	
-
 	public void forEachOutInMethods(Class<? extends BNode> from, Class<? extends BNode> until,
 			BiConsumer<Method, BNode> consumer) {
 		for (var m : getClass().getMethods()) {
@@ -412,7 +414,7 @@ public abstract class BNode {
 	}
 
 	public void createActions() {
-//		cachedActions.add(new Back(g, this));
+		// cachedActions.add(new Back(g, this));
 		cachedActions.elements.add(new QueryIA(this));
 		cachedActions.elements.add(new SeeClassNode(this));
 		cachedActions.elements.add(new CopyIDToClipboard(this));
@@ -563,8 +565,6 @@ public abstract class BNode {
 			}
 		});
 	}
-
-	final public static JsonNodeFactory factory = new JsonNodeFactory(true);
 
 	public ObjectNode describeAsJSON() {
 		return toJSONNode(1);
@@ -724,7 +724,7 @@ public abstract class BNode {
 		var tooltip = "<html>" + whatIsThis() + "<br><ul><li>" + idAsText() + "<li>" + getClass().getName()
 				+ "</ul></html>";
 		c.setToolTipText(tooltip);
-//		SelectableTooltip.addSelectableTooltip(c,tooltip);
+		// SelectableTooltip.addSelectableTooltip(c,tooltip);
 		Utils.idDropTarget(g(), c, droppedNode -> acceptDrop(droppedNode));
 
 		DragSource.getDefaultDragSource().createDefaultDragGestureRecognizer(c, DnDConstants.ACTION_COPY,

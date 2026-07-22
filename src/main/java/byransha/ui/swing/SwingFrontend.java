@@ -44,19 +44,19 @@ public class SwingFrontend extends SystemNode {
 		f.setLocation(0, 0);
 		f.setSize(9 * Utils.screenSize.height / 16, Utils.screenSize.height);
 		f.setVisible(true);
-//		considerUser(g.currentUser());
-	}	
+		// considerUser(g.currentUser());
+	}
 
 	private void considerUser(User newUser) {
 		f.getContentPane().removeAll();
-		
-		if( newUser.chats.elements.isEmpty()) {
+
+		if (newUser.chats.elements.isEmpty()) {
 			new ChatNode(newUser).nodes.elements.add(g());
 		}
-		
+
 		var panelList = newUser.chats.elements.stream().map(c -> new ChatPanel(c)).toList();
 		var p = new JPanel(new GridLayout(1, panelList.size()));
-		System.out.println(newUser +  "  " + panelList.size());
+		System.out.println(newUser + "  " + panelList.size());
 		panelList.forEach(p::add);
 		f.setContentPane(p);
 		f.doLayout();

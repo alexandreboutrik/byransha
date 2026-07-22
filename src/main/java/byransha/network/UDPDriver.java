@@ -10,8 +10,8 @@ import byransha.util.GZip;
 public class UDPDriver extends IPDriver {
 	DatagramSocket socket;
 
-	public UDPDriver(NetworkAgent g) throws FileNotFoundException, IOException {
-		super(g);
+	public UDPDriver(NetworkAgent g, int port) throws FileNotFoundException, IOException {
+		super(g, port);
 
 		new Thread(() -> {
 			try {

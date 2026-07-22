@@ -40,8 +40,6 @@ public class LucEventList extends SegmentedFilesEventList {
 
 	}
 
-	
-	
 	private SingleFileEventList getLocalList(Event e) {
 		int[] pathElements = new int[] { e.date.getYear(), e.date.getMonthValue(), e.date.getDayOfMonth(),
 				e.date.getHour(), e.date.getMinute() };
@@ -106,7 +104,7 @@ public class LucEventList extends SegmentedFilesEventList {
 	@Override
 	protected void forEachFile(Consumer<File> c) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

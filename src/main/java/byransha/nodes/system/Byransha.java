@@ -13,6 +13,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import byransha.VersionNode;
 import byransha.graph.BGraph;
 import byransha.graph.ShowInKishanView;
@@ -30,10 +33,12 @@ public class Byransha extends SystemNode {
 	@ShowInKishanView
 	public static final File binDirectory = new File(homeDirectory, "bin");
 	@ShowInKishanView
+	public static final File peersDirectory = new File(homeDirectory, "peers");
+	@ShowInKishanView
 	public static final String homepage = "https://webusers.i3s.unice.fr/~hogie/software/byransha/";
 	public static final String downloads = homepage + "/downloads/";
 	public static final String downloadBinaries = downloads + "bin/";
-	public static final String lastVersionURL = downloadBinaries + "last-version.txt";
+	public static final String lastVersionURL = downloadBinaries + "info.json";
 	public static byte[] currentExeBytes = "".getBytes();
 	@ShowInKishanView
 	public final VersionNode versionNode = new VersionNode(this);
@@ -58,25 +63,35 @@ public class Byransha extends SystemNode {
 		}, "check new version thread");// .start();
 	}
 
-	public Version lastVersionOnline() throws MalformedURLException, IOException, NoSuchAlgorithmException, KeyManagementException {
+	public Version lastVersionOnline()
+			throws MalformedURLException, IOException, NoSuchAlgorithmException, KeyManagementException {
 		var v = new Version();
 		System.out.println(lastVersionURL);
 		// Before calling URL.openStream() at line 57:
-		TrustManager[] trustAllCerts = new TrustManager[]{
-		    new X509TrustManager() {
-		        public X509Certificate[] getAcceptedIssuers() { return null; }
-		        public void checkClientTrusted(X509Certificate[] certs, String authType) {}
-		        public void checkServerTrusted(X509Certificate[] certs, String authType) {}
-		    }
+		TrustManager[] trustAllCerts = new TrustManager[] {
+				new X509TrustManager() {
+					public X509Certificate[] getAcceptedIssuers() {
+						return null;
+					}
+
+					public void checkClientTrusted(X509Certificate[] certs, String authType) {
+					}
+
+					public void checkServerTrusted(X509Certificate[] certs, String authType) {
+					}
+				}
 		};
 
 		SSLContext sc = SSLContext.getInstance("SSL");
 		sc.init(null, trustAllCerts, new java.security.SecureRandom());
 		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-		// Optional: Bypass hostname verification if the cert belongs to a different domain variant
+		// Optional: Bypass hostname verification if the cert belongs to a different
+		// domain variant
 		HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-		v.set(new String(new URL(lastVersionURL).openStream().readAllBytes()));
+		var jsonString = new String(new URL(lastVersionURL).openStream().readAllBytes());
+		JsonNode rootNode = objectMapper.readTree(jsonString);
+		v.set(rootNode.get("version").asText());
 		return v;
 	}
 

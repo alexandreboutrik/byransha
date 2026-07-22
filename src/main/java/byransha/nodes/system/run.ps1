@@ -15,7 +15,7 @@ function Get-RemoteFile {
     $Url      = "$BaseUrl/$FileName"
     $FilePath = Join-Path $DestinationDir $FileName
 
-    Write-Host "Downloading $Url..." -ForegroundColor Cyan
+    Write-Host "Downloading $Url..."
     Invoke-WebRequest -Uri $Url -OutFile $FilePath
 }
 
@@ -24,7 +24,7 @@ function Download-Artifacts {
     if (Test-Path $BinDir) {
         Remove-Item -Path $BinDir -Recurse -Force
     }
-    
+   
     New-Item -ItemType Directory -Force -Path $BinDir | Out-Null
 
     Write-Host "Initializing/Updating application components..."
@@ -42,6 +42,7 @@ function Download-Artifacts {
         if ([string]::IsNullOrEmpty($DesktopPath) -or -not (Test-Path $DesktopPath)) {
             $DesktopPath = Join-Path $HOME "Desktop"
         }
+ 
          # Define Windows Shortcut attributes
         $ScriptPath   = $PSCommandPath
         $ShortcutPath = Join-Path $DesktopPath "Launch App.lnk"
@@ -78,7 +79,7 @@ function Download-Artifacts {
 
     # Download JRE archive/zip (Target: JDK 26 Architecture)
     $JreUrl = "https://webusers.i3s.unice.fr/~hogie/software/byransha/downloads/bin/jvm/$OS.zip"
-    Write-Host "Downloading $JreUrl..." -ForegroundColor Cyan
+    Write-Host "Downloading $JreUrl..."
     $JrePath = Join-Path $BinDir "jre-$OS.zip"
     Invoke-WebRequest -Uri $JreUrl -OutFile $JrePath
     
