@@ -87,7 +87,7 @@ public class AES {
 	 */
 	public static Key createStringBasedOnHardware() {
 		try {
-			return HardwareKey.derive();
+			return HardwareKey.deriveSecretKey();
 		} catch (Exception e) {
 			throw new SecurityException("Failed to derive node key", e);
 		}
